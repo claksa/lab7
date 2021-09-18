@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/clientmod/clientmod.iml" filepath="$PROJECT_DIR$/clientmod/clientmod.iml" />
+      <module fileurl="file://$PROJECT_DIR$/generalmod/generalmod.iml" filepath="$PROJECT_DIR$/generalmod/generalmod.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lab7.iml" filepath="$PROJECT_DIR$/lab7.iml" />
+      <module fileurl="file://$PROJECT_DIR$/servermod/servermod.iml" filepath="$PROJECT_DIR$/servermod/servermod.iml" />
+    </modules>
+  </component>
+</project>
