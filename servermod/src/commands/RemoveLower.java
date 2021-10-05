@@ -1,11 +1,11 @@
 package commands;
 
-import mainlib.CollectionManager;
+import lib.CollectionManager;
 import models.Ticket;
 
 import java.util.ArrayList;
 
-public class RemoveLower extends AbstractCommand {
+public class RemoveLower extends DBCommand {
     private final CollectionManager collectionManager;
 
     public RemoveLower(CollectionManager collectionManager) {
@@ -32,5 +32,10 @@ public class RemoveLower extends AbstractCommand {
     @Override
     public String getDescription() {
         return " remove all elements from the collection that are less than the given one\n";
+    }
+
+    @Override
+    void connectToDB() {
+
     }
 }

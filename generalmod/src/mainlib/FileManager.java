@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import exceptions.EmptyIOException;
 import exceptions.IncorrectValueException;
 import exceptions.LackOfAccessException;
+import mainlib.Reader;
 import models.Location;
 import models.Ticket;
 import models.Venue;
@@ -20,16 +21,14 @@ import java.util.NoSuchElementException;
 import java.util.Vector;
 
 public class FileManager {
-    public static final String PATH = "C:\\учёба\\itmo\\labs\\programming\\lab6\\out.json";
+    public static final String PATH = "out.json";
 
 
     /**
      * the collection to be loaded into the file
-     *
      * @return vector
      */
     public Vector<Ticket> readData() {
-
 
         Gson gson = new Gson();
         try {
@@ -44,18 +43,18 @@ public class FileManager {
                 return new Vector<>();
             }
             Vector<Ticket> data = gson.fromJson(json.trim(), dataType);
-            Reader.PrintMsg("Collection read from file");
+            mainlib.Reader.PrintMsg("Collection read from file");
             return data;
         } catch (FileNotFoundException e) {
-            Reader.PrintErr(" file not found");
+            mainlib.Reader.PrintErr(" file not found");
         } catch (NoSuchElementException e) {
-            Reader.PrintErr("file is empty");
+            mainlib.Reader.PrintErr("file is empty");
         } catch (JsonParseException e) {
-            Reader.PrintErr("Another collection in the file");
+            mainlib.Reader.PrintErr("Another collection in the file");
         } catch (LackOfAccessException e) {
-            Reader.PrintErr("no read rights");
+            mainlib.Reader.PrintErr("no read rights");
         } catch (IOException e) {
-            Reader.PrintErr(" Houston, have problems. IOException...");
+            mainlib.Reader.PrintErr(" Houston, have problems. IOException...");
         }
         return new Vector<>();
     }
@@ -78,12 +77,12 @@ public class FileManager {
             }
             BufferedWriter writer = new BufferedWriter(new FileWriter(PATH));
             writer.write(gson.toJson(tickets));
-            Reader.PrintMsg("Collection saved successfully\n");
+            mainlib.Reader.PrintMsg("Collection saved successfully\n");
             writer.close();
         } catch (LackOfAccessException e) {
-            Reader.PrintErr("no write rights");
+            mainlib.Reader.PrintErr("no write rights");
         } catch (IOException e) {
-            Reader.PrintErr("there is no file to save");
+            mainlib.Reader.PrintErr("there is no file to save");
         }
     }
 
@@ -121,11 +120,11 @@ public class FileManager {
                     throw new EmptyIOException();
                 }
                 if (id < 0 | price < 0 | idV < 0 | capacity < 0) {
-                    Reader.PrintErr(" negative or zero value");
+                    mainlib.Reader.PrintErr(" negative or zero value");
                     throw new IncorrectValueException();
                 }
                 if (x > 518 | y > 332) {
-                    Reader.PrintErr(" value is greater than the maximum (x_max=518; y_max=332)");
+                    mainlib.Reader.PrintErr(" value is greater than the maximum (x_max=518; y_max=332)");
                     throw new IncorrectValueException();
                 }
             } catch (EmptyIOException | IncorrectValueException e) {

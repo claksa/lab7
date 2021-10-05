@@ -37,7 +37,6 @@ public class ServerConsole implements Runnable {
                     executeServer(enteredCommand);
                 } catch (NoSuchCommandException e) {
                     log.log(Level.SEVERE, "it is not a command");
-//                    mainlib.Reader.PrintMsg("it is not a command.");
                     Server.stop();
                 }
             }

@@ -2,7 +2,6 @@ package lib;
 
 import commands.Commandable;
 import mainlib.CommandNet;
-import mainlib.CommanderHolder;
 import models.Ticket;
 
 import java.io.Serializable;
@@ -16,7 +15,7 @@ public class Wrapper implements Serializable {
     public String getWrappedCommand(CommandNet cmd) {
         String[] command = cmd.getEnteredCommand();
         argument = command[1];
-        for (Commandable each : CommanderHolder.getCmdList()) {
+        for (Commandable each : ListHolder.getCmdList()) {
             if (!command[0].equals("")) {
                 if (command[0].equals(each.getName())) {
                     this.command = command[0];

@@ -1,5 +1,6 @@
 package models;
 
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -7,10 +8,10 @@ public class Ticket implements Serializable {
     private  int id;
     private final String name;
     private final Coordinates coordinates;
-    private final LocalDateTime creationDate;
+    private LocalDateTime creationDate;
     private final int price;
-    private final TicketType type; //Поле может быть null
-    private final Venue venue; //Поле может быть null
+    private final TicketType type;
+    private final Venue venue;
     private static Integer lastId = 0;
 
     public Ticket(String name,Coordinates coordinates, int price, TicketType type, Venue venue) {
@@ -20,13 +21,33 @@ public class Ticket implements Serializable {
         this.price = price;
         this.type = type;
         this.venue = venue;
-        lastId++;
-        this.id = lastId;
+        this.id = getIncLastId();
     }
 
+//    private void generateId(){
+//        for (Integer id: CollectionManager.getIds()) {
+//            if (id.equals(this.id)){
+//                this.id = getIncLastId();
+//            }
+//        }
+//    }
+
+
+
+    private static Integer getIncLastId(){
+        return ++lastId;
+    }
 
     public LocalDateTime getCreationDate() {
         return creationDate;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public static void setLastId(Integer lastId) {
+        Ticket.lastId = lastId;
     }
 
     public Integer getId() {

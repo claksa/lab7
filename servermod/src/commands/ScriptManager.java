@@ -11,22 +11,16 @@ import static mainlib.Reader.PrintErr;
 public class ScriptManager {
     private Scanner scriptReader;
 
-    /**
-     * constructor, open script file
-     * @param path Path to script file
-     */
+
     public ScriptManager(String path){
         try {
             scriptReader = new Scanner(new FileReader(path));
         } catch (FileNotFoundException e) {
-            PrintErr("Фаил не найден:" + path);
+            PrintErr("file doesn't found:" + path);
         }
     }
 
-    /**
-     * read next line from script
-     * @return line in String
-     */
+
     public String nextLine(){
         try {
             return scriptReader.nextLine().trim();

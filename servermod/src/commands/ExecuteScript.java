@@ -9,11 +9,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class ExecuteScript extends AbstractCommand {
-    Executor executor;
+    ScriptExecutor se;
     static ArrayList<String> executeScriptCommand;
 
     public ExecuteScript(){
-        executor = new Executor();
+        se = new ScriptExecutor();
     }
 
     @Override
@@ -31,11 +31,11 @@ public class ExecuteScript extends AbstractCommand {
                 throw new LackOfAccessException();
             }
             if (!argument.trim().equals("")) {
-                executor.executeScript(argument.trim());
+                se.executeScript(argument.trim());
             } else {
                 executeScriptCommand.add("please, enter this command with file name");
             }
-            executor.getScript().clear();
+            se.getScript().clear();
         } catch (LackOfAccessException e) {
             executeScriptCommand.add("the file does not have execute permission");
         } catch (NoSuchCommandException e) {

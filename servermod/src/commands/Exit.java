@@ -1,7 +1,7 @@
 package commands;
 
 
-import mainlib.CollectionManager;
+import lib.CollectionManager;
 import models.Ticket;
 
 import java.util.ArrayList;

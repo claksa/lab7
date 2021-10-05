@@ -29,7 +29,6 @@ public class DataHolder  {
            if (command.getEnteredCommand()[0].equals("connect")){
                isEstablishedConnection = true;
            }
-
        } catch (IOException e) {
            Reader.PrintErr("problems with receiving data");
        } catch (ClassNotFoundException e) {
@@ -38,9 +37,6 @@ public class DataHolder  {
        return command;
    }
 
-    public boolean isEstablishedConnection() {
-        return isEstablishedConnection;
-    }
 
     public ByteBuffer getBuffer(){
        return buffer;

@@ -1,6 +1,6 @@
 package commands;
 
-import mainlib.CollectionManager;
+import lib.CollectionManager;
 import mainlib.Reader;
 import models.Ticket;
 

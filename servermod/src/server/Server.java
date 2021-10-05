@@ -1,6 +1,10 @@
 package server;
 
 
+import db.Database;
+import exceptions.EmptyIOException;
+import lib.CommandFactory;
+import lib.ListHolder;
 import mainlib.Reader;
 
 import java.io.IOException;
@@ -15,6 +19,7 @@ import java.util.logging.Logger;
 
 public class Server {
     DatagramChannel channel;
+    static Database database;
     static Selector selector;
     public static boolean running = false;
     private static final int PORT = 9000;
@@ -34,19 +39,29 @@ public class Server {
             selector = Selector.open();
             SocketAddress socketAddress = new InetSocketAddress(PORT);
             server.bind(socketAddress);
-            Thread console = new Thread(new ServerConsole());
-            console.start();
-            channel.register(selector, SelectionKey.OP_READ, new DataHolder());
-            log.info("the server is listening on the " + PORT + " port");
-            new DataManager().manageData();
-        } catch (IOException e) {
+            database = new Database();
+            if (database.connect()) {
+                ListHolder listHolder = new ListHolder(new CommandFactory());
+                Thread console = new Thread(new ServerConsole());
+                console.start();
+                channel.register(selector, SelectionKey.OP_READ, new DataHolder());
+                log.info("the server is listening on the " + PORT + " port");
+                new DataManager().manageData();
+            }
+        }  catch (IOException e) {
             Reader.PrintErr("channel wasn't open");
+        } catch (EmptyIOException e) {
+            e.printStackTrace();
         }
     }
 
 
     public static Selector getSelector() {
         return selector;
+    }
+
+    public static Database getDatabase() {
+        return database;
     }
 
     public static void stop() {

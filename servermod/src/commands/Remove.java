@@ -2,12 +2,12 @@ package commands;
 
 import exceptions.EmptyIOException;
 import exceptions.NoSuchIdException;
-import mainlib.CollectionManager;
+import lib.CollectionManager;
 import models.Ticket;
 
 import java.util.ArrayList;
 
-public class Remove extends AbstractCommand {
+public class Remove extends DBCommand {
     private final CollectionManager collectionManager;
 
 
@@ -27,13 +27,21 @@ public class Remove extends AbstractCommand {
         } catch (NoSuchIdException e) {
             removeCommand.add("Error: no element with such id in collection");
         }
-        collectionManager.remove(id);
-        removeCommand.add("removed\n");
+        if (collectionManager.remove(id)) {
+            removeCommand.add("removed\n");
+        } else {
+            removeCommand.add("problems with removing");
+        }
         return removeCommand;
     }
 
     @Override
     public String getDescription() {
         return " (id) remove an item from the collection by its id\n";
+    }
+
+    @Override
+    void connectToDB() {
+
     }
 }

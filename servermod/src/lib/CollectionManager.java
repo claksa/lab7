@@ -1,25 +1,38 @@
-package mainlib;
+package lib;
 
+import exceptions.EmptyIOException;
+import mainlib.FileManager;
 import models.Ticket;
 import models.TicketType;
+import server.Server;
 
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 public class CollectionManager {
-    private List<Ticket> tickets;
     private final FileManager fileManager;
+    static List<Integer> ids  = new ArrayList<>();
+    List<Ticket> tickets;
 
 
-    public CollectionManager(FileManager fileManager) {
+    public CollectionManager(FileManager fileManager) throws EmptyIOException {
         this.fileManager = fileManager;
-        this.tickets = fileManager.readData();
+        this.tickets = Server.getDatabase().getTickets();
+//      tickets = fileManager.readData();
+        setIdList();
         sortCollection();
         fileManager.checkData(tickets);
     }
 
+
+    public void setIdList(){
+        ids = tickets.stream().map(Ticket::getId).collect(Collectors.toList());
+    }
+
+    public static List<Integer> getIds() {
+        return ids;
+    }
 
     public String getInformation() {
         String dataSimpleName = tickets.getClass().getSimpleName();
@@ -34,11 +47,6 @@ public class CollectionManager {
 
     public String getStringElements() {
         return String.valueOf(tickets);
-    }
-
-
-    public List<Ticket> getTickets() {
-        return tickets;
     }
 
 
@@ -58,34 +66,21 @@ public class CollectionManager {
         return maxID + 1;
     }
 
-
     public void update(Ticket update) {
-        Vector<Ticket> res = new Vector<>();
-        for (Ticket t : tickets) {
-            if (!t.getId().equals(update.getId())) {
-                res.add(t);
-            }
-        }
-        res.add(update);
-        tickets = res;
+        tickets = tickets.stream().map(ticket -> ticket.getId().equals(update.getId()) ? update : ticket).collect(Collectors.toCollection(Vector::new));
     }
 
     public void addItem(Ticket ticket) {
-        for (Ticket t : tickets) {
-            tickets.add(ticket);
-            System.out.println("added\n");
-            return;
-        }
+          tickets.add(ticket);
     }
 
-    public void addMin(Ticket ticket) {
-        for (Ticket t : tickets) {
-            if (ticket.getId() > t.getId()) {
-                System.out.println("you cannot add\n");
-                return;
-            }
+    public boolean addIfMin(Ticket ticket) {
+        boolean isAdded = false;
+        Integer min = tickets.stream().map(Ticket::getId).reduce(Integer::compareTo).orElse(-1);
+        if (ticket.getId() < min) {
+            isAdded = tickets.add(ticket);
         }
-        tickets.add(ticket);
+        return isAdded;
     }
 
 
@@ -99,13 +94,8 @@ public class CollectionManager {
     }
 
 
-    public void remove(Integer id) {
-        for (Ticket t : tickets) {
-            if (t.getId().equals(id)) {
-                tickets.remove(t);
-                return;
-            }
-        }
+    public boolean remove(Integer id) {
+        return tickets.removeIf(t -> t.getId().equals(id));
     }
 
     public boolean removeIfLowerId(Ticket ticket) {
@@ -133,7 +123,7 @@ public class CollectionManager {
         ArrayList<String> out = new ArrayList<>();
         Map<TicketType, Long> ticketsByType = tickets.stream().collect(Collectors.groupingBy(Ticket::getType, Collectors.counting()));
         for (Map.Entry<TicketType, Long> item : ticketsByType.entrySet()) {
-            out.add(item.getKey() + " -- " + item.getValue());
+            out.add(item.getKey() + " - " + item.getValue());
         }
         return out;
     }
@@ -143,4 +133,5 @@ public class CollectionManager {
             tickets = tickets.stream().sorted((Comparator.comparing(o -> o.getVenue().getType()))).collect(Collectors.toList());
         }
     }
+
 }

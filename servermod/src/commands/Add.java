@@ -1,12 +1,12 @@
 package commands;
 
-import mainlib.CollectionManager;
+import lib.CollectionManager;
 import models.Ticket;
+import server.Server;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Add extends AbstractCommand implements Serializable {
+public class Add extends DBCommand  {
     private final CollectionManager collectionManager;
 
     public Add(CollectionManager collectionManager) {
@@ -16,20 +16,28 @@ public class Add extends AbstractCommand implements Serializable {
     @Override
     public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
         ArrayList<String> addCommand = new ArrayList<>();
-        if (collectionManager.getTickets().isEmpty()){
-            collectionManager.getTickets().add(ticket);
-            addCommand.add("the new item added to the empty collection");
-            collectionManager.sortCollection();
+        if(Server.getDatabase().isValid()) {
+            if (Server.getDatabase().addToDatabase(ticket)) {
+                collectionManager.addItem(ticket);
+                addCommand.add("the new item added to the collection\n");
+            } else {
+                addCommand.add("error with adding to the collection");
+            }
             return addCommand;
+        } else {
+            addCommand.add(" error in adding to DB");
         }
-        collectionManager.addItem(ticket);
-        addCommand.add("the new item has been successfully added to the collection\n");
-        collectionManager.sortCollection();
         return addCommand;
     }
 
     @Override
     public String getDescription() {
         return "add new element to collection\n";
+    }
+
+    @Override
+    void connectToDB() {
+
+
     }
 }

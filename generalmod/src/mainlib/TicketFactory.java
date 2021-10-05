@@ -4,9 +4,9 @@ import models.*;
 
 import java.util.Scanner;
 
-public class ConsoleManager extends Reader {
+public class TicketFactory extends Reader {
 
-    public ConsoleManager(Scanner scanner) {
+    public TicketFactory(Scanner scanner) {
         super(scanner);
     }
 

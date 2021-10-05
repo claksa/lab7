@@ -1,21 +1,24 @@
-package mainlib;
+package lib;
+
 
 import commands.*;
+import db.Database;
+import exceptions.EmptyIOException;
+import mainlib.FileManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
-public class Commander {
+public class CommandFactory {
     protected List<Commandable> commandsList;
     CollectionManager collectionManager;
 
 
-    public Commander(){
+    public CommandFactory(){
         commandsList = new ArrayList<>();
     }
 
-    public List<Commandable> getCommandsList(FileManager fileManager, Scanner scanner){
+    public List<Commandable> getCommandsList(FileManager fileManager) throws EmptyIOException {
         collectionManager = new CollectionManager(fileManager);
         commandsList.add(new Add(collectionManager));
         commandsList.add(new AddMin(collectionManager));
@@ -30,7 +33,7 @@ public class Commander {
         commandsList.add(new Show(collectionManager));
         commandsList.add(new Shuffle(collectionManager));
         commandsList.add(new Update(collectionManager));
-        commandsList.add(new Connect());
+        commandsList.add(new Connect(collectionManager));
         commandsList.add(new ExecuteScript());
         return commandsList;
     }

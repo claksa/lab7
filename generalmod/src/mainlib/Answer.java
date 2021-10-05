@@ -20,7 +20,7 @@ public class Answer implements Serializable {
 
     @Override
     public String toString() {
-        return "Answer {" +
+        return "mainlib.Answer {" +
                 "answer=" + answer +
                 '}';
     }

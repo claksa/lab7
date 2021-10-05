@@ -3,11 +3,11 @@ package models;
 import java.io.Serializable;
 
 public class Venue implements Serializable {
-    private final long id;
+    private  long id;
     private final String name;
     private final Integer capacity;
-    private final VenueType type; //Поле может быть null
-    private final Address address; //Поле может быть null
+    private final VenueType type;
+    private final Address address;
     private static long lastVenueId = 0;
 
     public Venue(String name, Integer capacity, VenueType type, Address address) {
@@ -16,7 +16,7 @@ public class Venue implements Serializable {
         this.type = type;
         this.address = address;
         lastVenueId++;
-        id = lastVenueId;
+        this.id = lastVenueId;
     }
 
     public long getId() {
@@ -37,6 +37,10 @@ public class Venue implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     @Override

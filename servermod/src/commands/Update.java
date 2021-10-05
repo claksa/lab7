@@ -2,7 +2,7 @@ package commands;
 
 import exceptions.EmptyIOException;
 import exceptions.NoSuchIdException;
-import mainlib.CollectionManager;
+import lib.CollectionManager;
 import models.Ticket;
 
 import java.util.ArrayList;
