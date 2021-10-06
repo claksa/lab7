@@ -15,7 +15,7 @@ public class Database {
     private static final String URL = "jdbc:postgresql://localhost:5674/studs";
     private static final String LOGIN = "s312196";
     private static final String PASSWORD = "msw447";
-    private Connection connection;
+    Connection connection;
     private boolean isValid;
 
 

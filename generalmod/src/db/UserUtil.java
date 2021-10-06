@@ -1,6 +1,7 @@
 package db;
 
 import mainlib.Reader;
+import mainlib.User;
 import server.Server;
 
 import javax.xml.bind.DatatypeConverter;
@@ -8,23 +9,23 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Base64;
 import java.util.Scanner;
 
 public class UserUtil implements Util {
     private String salt;
     private static final SecureRandom RANDOM = new SecureRandom();
-    private static final String ALG = "SHA-256";
+    private static final String ALG = "SHA-512";
+    Database database = Server.getDatabase();
+
 
 
     @Override
     public boolean register(User user) {
         String statement = "INSERT INTO users (username,password,salt) VALUES(?,?,?)";
         try {
-            PreparedStatement preparedStatement = Server.getDatabase().getConnection().prepareStatement(statement);
+            PreparedStatement preparedStatement = database.connection.prepareStatement(statement);
             preparedStatement.setString(1,user.getUsername());
             preparedStatement.setString(2,hashPassword(user.getPassword()));
             user.setSalt(salt);
@@ -61,7 +62,7 @@ public class UserUtil implements Util {
         String statement = "SELECT * FROM users WHERE username = ? AND PASSWORD = ? AND SALT = ?";
         ResultSet resultSet = null;
         try {
-            PreparedStatement preparedStatement = Server.getDatabase().getConnection().prepareStatement(statement);
+            PreparedStatement preparedStatement = database.connection.prepareStatement(statement);
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, hashPassword(user.getPassword()));
             preparedStatement.setString(3, user.getSalt());

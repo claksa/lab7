@@ -1,5 +1,7 @@
 package db;
 
+import mainlib.User;
+
 public class UserManager implements Util {
     private final UserUtil userUtil = new UserUtil();
     private static UserState userState = UserState.NOT_REGISTERED;

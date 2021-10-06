@@ -11,7 +11,6 @@ import java.io.ObjectInputStream;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.util.concurrent.Callable;
 
 public class DataHolder  {
     public boolean isEstablishedConnection = false;
@@ -21,20 +20,17 @@ public class DataHolder  {
     DatagramChannel channel = null;
 
 
-   public CommandNet getReceivedCommand()  {
-       CommandNet command = null;
+   public Object getReceivedData()  {
+       Object data = null;
        try(ByteArrayInputStream in = new ByteArrayInputStream(b);
            ObjectInputStream ois = new ObjectInputStream(in)){
-           command = (CommandNet) ois.readObject();
-           if (command.getEnteredCommand()[0].equals("connect")){
-               isEstablishedConnection = true;
-           }
+           data = ois.readObject();
        } catch (IOException e) {
            Reader.PrintErr("problems with receiving data");
        } catch (ClassNotFoundException e) {
            Reader.PrintErr(" problems with reading data");
        }
-       return command;
+       return data;
    }
 
 

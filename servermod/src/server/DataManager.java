@@ -15,22 +15,19 @@ import java.util.logging.Logger;
 public class DataManager {
     Selector selector;
     SelectionKey key = null;
-//    private static final ExecutorService executorService = Executors.newFixedThreadPool(6);
     private static final  Logger log = Logger.getLogger(DataManager.class.getName());
-    volatile LinkedList<DataHolder> queue = new LinkedList<DataHolder>();
-    private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
 
 
     public void manageData() {
 
         selector = Server.getSelector();
-        ExecutorService serviceSender = null;
         while (Server.running) {
             try {
                 selector.select(50);
                 Set<SelectionKey> selectedKeys = selector.selectedKeys();
-//                serviceSender = Executors.newFixedThreadPool(6);
                 Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
 
                 while (keyIterator.hasNext()) {
@@ -51,17 +48,13 @@ public class DataManager {
                 log.log(Level.SEVERE, "error in getting the selector");
             }
         }
-
-//        if (serviceSender != null) {
-//            serviceSender.shutdown();
-//        }
-
-//        executorService.shutdown();
+        executorService.shutdown();
     }
-//
-//    public static ExecutorService getExecutorService() {
-//        return executorService;
-//    }
+
+    public static ExecutorService getExecutorService() {
+        return executorService;
+    }
+
     public static ReentrantReadWriteLock getLock() {
         return lock;
     }

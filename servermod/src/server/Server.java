@@ -14,12 +14,14 @@ import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server {
     DatagramChannel channel;
-    static Database database;
+    static Database database = new Database();
     static Selector selector;
     public static boolean running = false;
     private static final int PORT = 9000;
@@ -39,7 +41,6 @@ public class Server {
             selector = Selector.open();
             SocketAddress socketAddress = new InetSocketAddress(PORT);
             server.bind(socketAddress);
-            database = new Database();
             if (database.connect()) {
                 ListHolder listHolder = new ListHolder(new CommandFactory());
                 Thread console = new Thread(new ServerConsole());

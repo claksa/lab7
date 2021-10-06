@@ -5,7 +5,7 @@ import models.Ticket;
 import java.io.Serializable;
 import java.util.Scanner;
 
-public class CommandNet implements Serializable {
+public class CommandNet  implements Serializable {
     String[] enteredCommand;
     Ticket ticket;
     Integer id;
