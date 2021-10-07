@@ -29,16 +29,14 @@ public class ReceiveDataHandler {
             data.channel.configureBlocking(false);
             data.getBuffer().clear();
             DataManager.getLock().readLock().lock();
-            Future<ByteBuffer> future = DataManager.getExecutorService().submit(data::getBuffer);
-            if (future.isDone()) {
-                data.setClientAdr(data.channel.receive(future.get()));
-                if (data.getReceivedData() instanceof CommandNet) {
-                    receivedCommand = (CommandNet) data.getReceivedData();
-                    log.info("the server received the command from the client: " + receivedCommand.getEnteredCommand()[0]);
-                } else if (data.getReceivedData() instanceof User) {
-                    user = (User) data.getReceivedData();
-                    log.info("the server received a user command!");
-                }
+            ByteBuffer future = DataManager.getExecutorService().submit(data::getBuffer).get();
+            data.setClientAdr(data.channel.receive(future));
+            if (data.getReceivedData() instanceof CommandNet) {
+                receivedCommand = (CommandNet) data.getReceivedData();
+                log.info("the server received the command from the client: " + receivedCommand.getEnteredCommand()[0]);
+            } else if (data.getReceivedData() instanceof User) {
+                user = (User) data.getReceivedData();
+                log.info("the server received a user command!");
             }
         } catch (IOException e) {
             log.log(Level.SEVERE, "error in configure blocking or data receiving");

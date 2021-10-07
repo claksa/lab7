@@ -1,8 +1,6 @@
 package server;
 
 
-
-import mainlib.CommandNet;
 import mainlib.Reader;
 
 import java.io.ByteArrayInputStream;

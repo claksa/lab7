@@ -7,8 +7,9 @@ public class Answer implements Serializable {
     private final ArrayList<String> answer;
     AnswerType answerType;
 
-    public Answer(ArrayList<String> answer) {
+    public Answer(ArrayList<String> answer, AnswerType answerType) {
         this.answer = answer;
+        this.answerType = answerType;
     }
 
     public ArrayList<String> getAnswer() {
@@ -29,7 +30,7 @@ public class Answer implements Serializable {
 
     @Override
     public String toString() {
-        return "mainlib.Answer {" +
+        return "Answer {" +
                 "answer=" + answer +
                 '}';
     }

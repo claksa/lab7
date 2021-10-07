@@ -1,4 +1,5 @@
 
+
 import db.UserManager;
 import mainlib.Answer;
 import mainlib.AnswerType;
@@ -8,14 +9,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.PortUnreachableException;
+import java.util.Scanner;
 
+import static mainlib.AnswerType.WIN;
 import static mainlib.Reader.PrintErr;
 import static mainlib.Reader.PrintMsg;
 
 public class ClientResponse implements Runnable {
     static boolean isEstablishedConnection = false;
     AnswerType answerType;
-    boolean isAccessedToWork = false;
+    Scanner scanner = new Scanner(System.in);
+//    boolean isAccessedToWork = false;
 
 
     @Override
@@ -30,20 +34,21 @@ public class ClientResponse implements Runnable {
                 ObjectInputStream ois = new ObjectInputStream(in);
                 Answer answer = (Answer) ois.readObject();
                 answerType = answer.getAnswerType();
-                if (answerType.equals(AnswerType.USER)){
-                    isAccessedToWork = true;
-                }
-                if (answerType.equals(AnswerType.INT_COMMAND) && isAccessedToWork) {
-                    if (answer.getAnswer().get(0).equals("connected")) {
-                        if (Client.commandNetNext != null) {
-                            System.out.println(" i try to send command [ " + Client.commandNetNext.getEnteredCommand()[0] + " ]");
-                            Client.send(Client.commandNetNext);
-                        }
+                if (answer.getAnswer().get(0).equals("connected")) {
+                    if (Client.commandNetNext != null) {
+                        Client.send(Client.commandNetNext);
                     } else {
-                        Client.commandNetNext = null;
+                        Client.sendUser();
                     }
+                } else {
+                    answer.printAnswer();
                 }
-                answer.printAnswer();
+                if (!answer.getAnswerType().equals(WIN)){
+                    Client.stop();
+                }
+                if (answer.getAnswerType().equals(WIN) && UserManager.isAuthorized()){
+                    Client.startCommandSender();
+                }
             } catch (PortUnreachableException e) {
                 try {
                     PrintMsg("failed to connect to the server :( try after 3 seconds");

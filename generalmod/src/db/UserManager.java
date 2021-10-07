@@ -2,14 +2,18 @@ package db;
 
 import mainlib.User;
 
+import java.util.Scanner;
+
 public class UserManager implements Util {
     private final UserUtil userUtil = new UserUtil();
     private static UserState userState = UserState.NOT_REGISTERED;
+    private static boolean isAuthorized = false;
 
 
     @Override
     public boolean register(User user) {
-        if (userUtil.register(user)){
+        isAuthorized = userUtil.register(user);
+        if (isAuthorized) {
             userState = UserState.REGISTERED;
             return true;
         }
@@ -18,7 +22,8 @@ public class UserManager implements Util {
 
     @Override
     public boolean authorize(User user) {
-        if(userUtil.authorize(user)){
+        isAuthorized = userUtil.authorize(user);
+        if (isAuthorized) {
             userState = UserState.AUTHORIZED;
             return true;
         }
@@ -33,4 +38,7 @@ public class UserManager implements Util {
         return userState;
     }
 
+    public static boolean isAuthorized() {
+        return isAuthorized;
+    }
 }

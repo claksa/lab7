@@ -1,3 +1,4 @@
+import exceptions.EmptyIOException;
 import mainlib.User;
 import db.UserAct;
 import db.UserManager;
@@ -18,8 +19,9 @@ public class Client {
     static SocketAddress serverAdr = new InetSocketAddress("localhost", 9000);
     static DatagramSocket socket;
     static CommandNet commandNetNext = null;
-    Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
     boolean isStarted = false;
+    static boolean isStartedBasicDelivery = false;
 
     public Client() {
         System.out.println("client started");
@@ -33,27 +35,72 @@ public class Client {
         }
     }
 
+    public static void startCommandSender() {
+        isStartedBasicDelivery = true;
+        Thread thr = new Thread(new BasicDelivery());
+        thr.start();
+    }
 
-    public void run() {
+    public static void stop() {
+        isStartedBasicDelivery = false;
+    }
+
+    public static User createUser() {
+        PrintMsg("register/log in");
+        String option = scanner.nextLine();
+        User user = null;
         try {
-            while (true) {
-                if (!isStarted) {
-                    startClient();
-                    continue;
-                }
-                if (sendUser() && !UserManager.getUserState().equals(UserState.NOT_REGISTERED)) {
-                    sendCommand(scanner.nextLine());
-                } else {
-                    PrintErr("problems with user registration/authorizing");
-                    break;
-                }
+            String username = null;
+            String password = null;
+            if (option.equals("register") || option.equals("log in")) {
+                PrintMsg("Enter a username:");
+                username = scanner.nextLine();
+                PrintMsg("Enter a password");
+                password = scanner.nextLine();
+            } else {
+                throw new EmptyIOException();
             }
-        } catch (LackOfAccessException e) {
-            PrintErr("you cannot send commands if you are not logged in");
+            if (option.equals("register")) {
+                user = new User(username, password, UserAct.REGISTER);
+            } else {
+                user = new User(username, password, UserAct.LOG_IN);
+            }
+        } catch (EmptyIOException e) {
+            PrintErr("you write nothing! Please, enter some data!");
+        }
+      return user;
+    }
+
+    public static void sendUser(){
+        try {
+            send(createUser());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
+//    public void run() {
+//        try {
+//            while (true) {
+//                if (!isStarted) {
+//                    startClient();
+//                }
+////                String line = scanner.nextLine();
+////                if (line.equals("exit")) {
+////                    System.exit(0);
+////                }
+////                sendCommand(line);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+////        catch (LackOfAccessException e) {
+////            PrintErr("you cannot send commands if you are not logged in");
+////        } catch (IOException e) {
+////            e.printStackTrace();
+////        }
+//    }
 
     public void startClient() {
         if (isStarted) {
@@ -66,21 +113,7 @@ public class Client {
         }
     }
 
-    public boolean sendUser() throws IOException {
-        if (ClientResponse.isEstablishedConnection) {
-            send(getUser());
-            return true;
-        }
-        return false;
-    }
-
-    public void sendCommand(String line) throws IOException, LackOfAccessException {
-        if (UserManager.getUserState().equals(UserState.NOT_REGISTERED)) {
-            throw new LackOfAccessException();
-        }
-        if (line.equals("exit")) {
-            System.exit(0);
-        }
+    public static void sendCommand(String line) throws IOException, LackOfAccessException {
         String[] message = (line.trim() + " ").split(" ", 2);
         System.out.println("line in client: " + line);
         CommandNet cmd = new CommandNet(message);
@@ -103,8 +136,7 @@ public class Client {
         }
     }
 
-
-    public  static void send(Object data) throws IOException {
+    public static void send(Object data) throws IOException {
         if (data instanceof CommandNet) {
             if (!((CommandNet) data).getEnteredCommand()[0].equals("connect")) {
                 commandNetNext = (CommandNet) data;
@@ -120,21 +152,5 @@ public class Client {
         System.out.println("client send command to server");
     }
 
-    public User getUser() {
-        System.out.println("Hello! You've got 2 options: register/log in. Enter a chosen one");
-        String line = scanner.nextLine();
-        System.out.println("OPTION in user worker: " + line);
-        System.out.println("Enter a username: ");
-        String username = scanner.nextLine();
-        System.out.println("Enter a password: ");
-        String password = scanner.nextLine();
-        User user = null;
-        if (line.equals("register")) {
-            user = new User(username, password, UserAct.REGISTER);
-        } else if (line.equals("log in")) {
-            user = new User(username, password, UserAct.LOG_IN);
-        }
-        return user;
-    }
 
 }

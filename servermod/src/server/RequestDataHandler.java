@@ -16,11 +16,15 @@ import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import static mainlib.AnswerType.ERROR;
+import static mainlib.AnswerType.WIN;
+
 public class RequestDataHandler implements Runnable {
     SelectionKey key;
     DataHolder dataHolder;
     CommandNet commandNet;
     User user;
+    AnswerType answerType;
     private static final Logger log = Logger.getLogger(ReceiveDataHandler.class.getName());
 
     public RequestDataHandler(SelectionKey key) {
@@ -53,10 +57,9 @@ public class RequestDataHandler implements Runnable {
                 String argument = wrapper.getArgument();
                 Ticket tick = wrapper.getWrappedTicket(commandNet);
                 Integer id = wrapper.getWrappedId(commandNet);
-                if (UserManager.getUserState().equals(UserState.NOT_REGISTERED) && command.equals("connect")) {
+                if (!UserManager.getUserState().equals(UserState.NOT_REGISTERED) || command.equals("connect")) {
                     answer = new Executor().execute(command, argument, tick, id);
-                    answer.setAnswerStatus(AnswerType.INT_COMMAND);
-                    oos.writeObject(answer);
+                    answerType = WIN;
                 }
             } else if (received instanceof User) {
                 user = (User) received;
@@ -65,16 +68,23 @@ public class RequestDataHandler implements Runnable {
                 if (user.getUserAct().equals(UserAct.REGISTER)) {
                     if (userManager.register(user)) {
                         answerList.add("registered");
+                        answerType = WIN;
+                    } else {
+                        answerList.add("problems with registration");
+                        answerType = ERROR;
                     }
                 } else if (user.getUserAct().equals(UserAct.LOG_IN)) {
                     if (userManager.authorize(user)) {
                         answerList.add("authorized");
+                        answerType = WIN;
+                    } else {
+                        answerList.add("problems with authorization");
+                        answerType = ERROR;
                     }
                 }
-                answer = new Answer(answerList);
-                answer.setAnswerStatus(AnswerType.USER);
-                oos.writeObject(new Answer(answerList));
+                answer = new Answer(answerList, answerType);
             }
+            oos.writeObject(answer);
             byte[] b = out.toByteArray();
             ByteBuffer buff = ByteBuffer.wrap(b);
             dataHolder.channel.send(buff, dataHolder.getClientAdr());

@@ -3,12 +3,13 @@ package commands;
 
 import lib.ListHolder;
 import mainlib.Answer;
-import mainlib.AnswerType;
 import models.Ticket;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import static mainlib.AnswerType.ERROR;
+import static mainlib.AnswerType.WIN;
 import static mainlib.Reader.PrintErr;
 import static mainlib.Reader.PrintMsg;
 
@@ -30,8 +31,7 @@ public class Executor implements Serializable {
                 }
             }
             if (isRightCommand) {
-                answer = new Answer(commandToExecute.execute(argument,ticket, id));
-                answer.setAnswerStatus(AnswerType.INT_COMMAND);
+                answer = new Answer(commandToExecute.execute(argument,ticket, id),WIN);
                 PrintMsg("command was successfully executed!\n");
             }
         } else {
@@ -40,8 +40,7 @@ public class Executor implements Serializable {
             PrintErr(error);
             list.add(error);
             list.add("You can enter 'help' to get list about available commands!");
-            answer = new Answer(list);
-            answer.setAnswerStatus(AnswerType.ERROR);
+            answer = new Answer(list,ERROR);
         }
         return answer;
     }
