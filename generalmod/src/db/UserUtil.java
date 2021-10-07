@@ -25,14 +25,16 @@ public class UserUtil implements Util {
     public boolean register(User user) {
         String statement = "INSERT INTO users (username,password,salt) VALUES(?,?,?)";
         try {
-            PreparedStatement preparedStatement = database.connection.prepareStatement(statement);
-            preparedStatement.setString(1,user.getUsername());
-            preparedStatement.setString(2,hashPassword(user.getPassword()));
-            user.setSalt(salt);
-            preparedStatement.setString(3,salt);
-            if (preparedStatement.executeUpdate()!= 0 ){
-                user.setSalt(getSalt());
-                return true;
+            if (!checkUser(user)) {
+                PreparedStatement preparedStatement = database.connection.prepareStatement(statement);
+                preparedStatement.setString(1, user.getUsername());
+                preparedStatement.setString(2, hashPassword(user.getPassword()));
+                user.setSalt(salt);
+                preparedStatement.setString(3, salt);
+                if (preparedStatement.executeUpdate() != 0) {
+                    user.setSalt(getSalt());
+                    return true;
+                }
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -42,20 +44,11 @@ public class UserUtil implements Util {
 
     @Override
     public boolean authorize(User user) {
-        boolean isAddedToTheDB = false;
-        if (checkUser(user)){
+        if (checkUser(user)) {
             System.out.println("You are found in the system!");
-            isAddedToTheDB = true;
-        } else {
-            System.out.println("If you want to register with the entered data, enter yes. If you want to log out, enter no");
-            Scanner scanner = new Scanner(System.in);
-            if (scanner.nextLine().equals("yes")){
-                isAddedToTheDB = register(user); //типа сразу регистрирует и работает как с авториз-м пользователем
-            } else if (scanner.nextLine().equals("no")){
-                System.exit(0); //на случай если пользователя всё достало, и он решил пойти пить чаёк
-            }
+             return true;
         }
-        return isAddedToTheDB;
+        return false;
     }
 
     public ResultSet getUser(User user){
@@ -64,7 +57,7 @@ public class UserUtil implements Util {
         try {
             PreparedStatement preparedStatement = database.connection.prepareStatement(statement);
             preparedStatement.setString(1, user.getUsername());
-            preparedStatement.setString(2, hashPassword(user.getPassword()));
+            preparedStatement.setString(2, user.getPassword());
             preparedStatement.setString(3, user.getSalt());
             resultSet = preparedStatement.executeQuery();
         } catch (SQLException throwables) {
@@ -74,15 +67,18 @@ public class UserUtil implements Util {
     }
 
     public boolean checkUser(User user){
-        ResultSet resultSet = getUser(user);
+        String statement = "SELECT * FROM users WHERE username=?";
+        ResultSet resultSet = null;
         int count = 0;
-        while (true){
-            try {
-                if (!resultSet.next()) break;
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+        try {
+            PreparedStatement preparedStatement = database.connection.prepareStatement(statement);
+            preparedStatement.setString(1,user.getUsername());
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                count++;
             }
-            count++;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
         return count > 0;
     }
@@ -96,9 +92,7 @@ public class UserUtil implements Util {
             RANDOM.nextBytes(salt);
             digest.update(salt);
             byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
-            this.salt = Base64.getEncoder().encodeToString(salt);
             this.salt = DatatypeConverter.printHexBinary(salt).toLowerCase();
-//            hashPassword = Base64.getEncoder().encodeToString(hash);
             hashPassword = DatatypeConverter.printHexBinary(hash).toLowerCase();
         } catch (NoSuchAlgorithmException e) {
             Reader.PrintErr("no such encryption algorithm: " + ALG);

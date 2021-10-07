@@ -11,6 +11,7 @@ import java.net.DatagramPacket;
 import java.net.PortUnreachableException;
 import java.util.Scanner;
 
+import static mainlib.AnswerType.ERROR;
 import static mainlib.AnswerType.WIN;
 import static mainlib.Reader.PrintErr;
 import static mainlib.Reader.PrintMsg;
@@ -45,6 +46,9 @@ public class ClientResponse implements Runnable {
                 }
                 if (!answer.getAnswerType().equals(WIN)){
                     Client.stop();
+                }
+                if (answer.getAnswerType().equals(ERROR)&&!UserManager.isAuthorized()){
+                    Client.sendUser();
                 }
                 if (answer.getAnswerType().equals(WIN) && UserManager.isAuthorized()){
                     Client.startCommandSender();

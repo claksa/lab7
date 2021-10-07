@@ -70,7 +70,7 @@ public class RequestDataHandler implements Runnable {
                         answerList.add("registered");
                         answerType = WIN;
                     } else {
-                        answerList.add("problems with registration");
+                        answerList.add("problems with registration.\nMost likely you are already in the system! try to log in:");
                         answerType = ERROR;
                     }
                 } else if (user.getUserAct().equals(UserAct.LOG_IN)) {
@@ -78,7 +78,7 @@ public class RequestDataHandler implements Runnable {
                         answerList.add("authorized");
                         answerType = WIN;
                     } else {
-                        answerList.add("problems with authorization");
+                        answerList.add("problems with authorization.\nWe didn't find you in the system! Try to register:");
                         answerType = ERROR;
                     }
                 }
