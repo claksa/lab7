@@ -4,6 +4,7 @@ import exceptions.EmptyIOException;
 import exceptions.NoSuchIdException;
 import lib.CollectionManager;
 import models.Ticket;
+import server.Server;
 
 import java.util.ArrayList;
 
@@ -21,7 +22,12 @@ public class Update extends AbstractCommand {
         try {
             if (argument.trim().equals("")) throw new EmptyIOException();
             id = Integer.parseInt(argument.trim());
-            if (collectionManager.isEqualId(id)) throw new NoSuchIdException();
+            if (Server.getDatabase().checkId(id)) throw new NoSuchIdException();
+            if (Server.getDatabase().updateCollection(ticket)) {
+                updateCommand.add("updated\n");
+            } else {
+                updateCommand.add("error in updating\n");
+            }
         } catch (NumberFormatException e) {
             updateCommand.add("Error: you enter not number value");
         } catch (EmptyIOException e) {
@@ -29,8 +35,6 @@ public class Update extends AbstractCommand {
         } catch (NoSuchIdException e) {
             updateCommand.add("Error: No such ID in collection");
         }
-        collectionManager.update(ticket);
-        updateCommand.add("updated\n");
         return updateCommand;
     }
 

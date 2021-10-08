@@ -4,6 +4,7 @@ import exceptions.EmptyIOException;
 import exceptions.NoSuchIdException;
 import lib.CollectionManager;
 import models.Ticket;
+import server.Server;
 
 import java.util.ArrayList;
 
@@ -21,13 +22,14 @@ public class Remove extends DBCommand {
         ArrayList<String> removeCommand = new ArrayList<>();
         try {
             if (argument.trim().isEmpty()) throw new EmptyIOException();
-            if (collectionManager.isEqualId(id)) throw new NoSuchIdException();
+            if (Server.getDatabase().checkId(id)) throw new NoSuchIdException();
         } catch (EmptyIOException e) {
             removeCommand.add("Error: you entered a null-argument");
         } catch (NoSuchIdException e) {
             removeCommand.add("Error: no element with such id in collection");
         }
-        if (collectionManager.remove(id)) {
+        if (Server.getDatabase().removeById(id,ticket)) {
+            collectionManager.remove(id);
             removeCommand.add("removed\n");
         } else {
             removeCommand.add("problems with removing");

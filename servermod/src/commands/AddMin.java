@@ -2,11 +2,12 @@ package commands;
 
 import lib.CollectionManager;
 import models.Ticket;
+import server.Server;
 
 import java.util.ArrayList;
 
 public class AddMin extends DBCommand {
-    private final CollectionManager collectionManager;
+    CollectionManager collectionManager;
 
     public AddMin(CollectionManager collectionManager) {
         this.collectionManager = collectionManager;
@@ -15,13 +16,18 @@ public class AddMin extends DBCommand {
     @Override
     public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
         ArrayList<String> addMinCommand = new ArrayList<>();
-        if (collectionManager.isEqualId(id)) {
-            if(collectionManager.addIfMin(ticket)) {
-                addMinCommand.add("min item added\n");
-            } else {
-                addMinCommand.add("error with adding");
+        if (Server.getDatabase().isValid()){
+            if (Server.getDatabase().checkId(id)) {
+                if (Server.getDatabase().addIfMin(ticket)) {
+                    collectionManager.addItem(ticket);
+                    addMinCommand.add("min item added\n");
+                } else {
+                    addMinCommand.add("error with adding");
+                }
             }
-        } else addMinCommand.add("such an ID already exists, alas");
+        } else {
+            addMinCommand.add("error in access to DB");
+        }
         return addMinCommand;
     }
 

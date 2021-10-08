@@ -19,7 +19,7 @@ public class CommandFactory {
     }
 
     public List<Commandable> getCommandsList(FileManager fileManager) throws EmptyIOException {
-        collectionManager = new CollectionManager(fileManager);
+        collectionManager = new CollectionManager();
         commandsList.add(new Add(collectionManager));
         commandsList.add(new AddMin(collectionManager));
         commandsList.add(new Clear(collectionManager));

@@ -16,6 +16,7 @@ import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import static db.UserState.AUTHORIZED;
 import static mainlib.AnswerType.ERROR;
 import static mainlib.AnswerType.WIN;
 
@@ -23,8 +24,9 @@ public class RequestDataHandler implements Runnable {
     SelectionKey key;
     DataHolder dataHolder;
     CommandNet commandNet;
-    User user;
+    static User user;
     AnswerType answerType;
+    UserState userState;
     private static final Logger log = Logger.getLogger(ReceiveDataHandler.class.getName());
 
     public RequestDataHandler(SelectionKey key) {
@@ -68,6 +70,7 @@ public class RequestDataHandler implements Runnable {
                 if (user.getUserAct().equals(UserAct.REGISTER)) {
                     if (userManager.register(user)) {
                         answerList.add("registered");
+                        userState = AUTHORIZED;
                         answerType = WIN;
                     } else {
                         answerList.add("problems with registration.\nMost likely you are already in the system! try to log in:");
@@ -76,6 +79,7 @@ public class RequestDataHandler implements Runnable {
                 } else if (user.getUserAct().equals(UserAct.LOG_IN)) {
                     if (userManager.authorize(user)) {
                         answerList.add("authorized");
+                        userState = AUTHORIZED;
                         answerType = WIN;
                     } else {
                         answerList.add("problems with authorization.\nWe didn't find you in the system! Try to register:");
@@ -83,6 +87,7 @@ public class RequestDataHandler implements Runnable {
                     }
                 }
                 answer = new Answer(answerList, answerType);
+                answer.setUserState(userState);
             }
             oos.writeObject(answer);
             byte[] b = out.toByteArray();
@@ -98,5 +103,9 @@ public class RequestDataHandler implements Runnable {
         } finally {
             DataManager.getLock().writeLock().unlock();
         }
+    }
+
+    public static User getUser() {
+        return user;
     }
 }

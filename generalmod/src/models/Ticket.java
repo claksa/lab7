@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public class Ticket implements Serializable {
     private  int id;
-    private final String name;
+    private  String name;
     private final Coordinates coordinates;
     private LocalDateTime creationDate;
     private final int price;
@@ -60,6 +60,10 @@ public class Ticket implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public TicketType getType() {

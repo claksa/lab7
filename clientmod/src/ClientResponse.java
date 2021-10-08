@@ -1,6 +1,7 @@
 
 
 import db.UserManager;
+import db.UserState;
 import mainlib.Answer;
 import mainlib.AnswerType;
 
@@ -11,6 +12,8 @@ import java.net.DatagramPacket;
 import java.net.PortUnreachableException;
 import java.util.Scanner;
 
+import static db.UserState.AUTHORIZED;
+import static db.UserState.NOT_REGISTERED;
 import static mainlib.AnswerType.ERROR;
 import static mainlib.AnswerType.WIN;
 import static mainlib.Reader.PrintErr;
@@ -18,9 +21,8 @@ import static mainlib.Reader.PrintMsg;
 
 public class ClientResponse implements Runnable {
     static boolean isEstablishedConnection = false;
+    static boolean isStartedBasicDelivery = false;
     AnswerType answerType;
-    Scanner scanner = new Scanner(System.in);
-//    boolean isAccessedToWork = false;
 
 
     @Override
@@ -44,15 +46,19 @@ public class ClientResponse implements Runnable {
                 } else {
                     answer.printAnswer();
                 }
-                if (!answer.getAnswerType().equals(WIN)){
-                    Client.stop();
+                if (!answer.getAnswerType().equals(WIN)) {
+                    stop();
                 }
-                if (answer.getAnswerType().equals(ERROR)&&!UserManager.isAuthorized()){
+                if (answer.getAnswerType().equals(ERROR) && !UserManager.isAuthorized()) {
                     Client.sendUser();
                 }
-                if (answer.getAnswerType().equals(WIN) && UserManager.isAuthorized()){
-                    Client.startCommandSender();
+                boolean ded = answer.getAnswerType().equals(WIN) && answer.getUserState().equals(AUTHORIZED);
+                System.out.println(ded);
+                if (ded) {
+                    System.out.println("i would like to send command!");
+                    startCommandSender();
                 }
+
             } catch (PortUnreachableException e) {
                 try {
                     PrintMsg("failed to connect to the server :( try after 3 seconds");
@@ -75,6 +81,17 @@ public class ClientResponse implements Runnable {
             }
             System.out.println("LISTENING: ");
         }
+    }
+
+    public void startCommandSender() {
+        isStartedBasicDelivery = true;
+        System.out.println("IN CLIENT: ");
+        Thread thr = new Thread(new BasicDelivery());
+        thr.start();
+    }
+
+    public void stop() {
+        isStartedBasicDelivery = false;
     }
 
 }

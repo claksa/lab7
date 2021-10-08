@@ -2,6 +2,7 @@ package commands;
 
 import lib.CollectionManager;
 import models.Ticket;
+import server.Server;
 
 import java.util.ArrayList;
 
@@ -15,15 +16,15 @@ public class RemoveLower extends DBCommand {
     @Override
     public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
         ArrayList<String> removeLowerCommand = new ArrayList<>();
-        if (collectionManager.isEqualId(id)) {
-            ticket.setId(id);
-            if(collectionManager.removeIfLowerId(ticket)) {
+        if (Server.getDatabase().checkId(id)) {
+            if(Server.getDatabase().removeByLowerId(ticket,id)) {
+                collectionManager.removeIfLowerId(ticket);
                 removeLowerCommand.add("removed\n");
             } else {
                 removeLowerCommand.add("Theres is no elements to remove");
             }
         } else {
-            removeLowerCommand.add("I can not delete this ID. Please, enter unique");
+            removeLowerCommand.add("This id already exists! Enter less");
         }
         return removeLowerCommand;
     }

@@ -1,5 +1,6 @@
 package mainlib;
 
+import db.UserManager;
 import models.*;
 
 import java.util.Scanner;
@@ -16,8 +17,7 @@ public class TicketFactory extends Reader {
      */
 
     public Ticket getTicketObj() {
-//        PrintMsg("Ticket ID: " + id );
-        String name = readString("Enter your name for the ticket: ");
+//        String name = readString("Enter your username for the ticket: ");
 
         double x;
         while (true) {
@@ -57,7 +57,7 @@ public class TicketFactory extends Reader {
 
         TicketType ticketType = readEnumType(TicketType.class, "Enter a ticket type:");
 
-        return new Ticket(name,coordinates, price, ticketType, getVenueObj());
+        return new Ticket(UserManager.getName(),coordinates, price, ticketType, getVenueObj());
     }
 
     /**

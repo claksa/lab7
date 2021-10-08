@@ -21,7 +21,6 @@ public class Client {
     static CommandNet commandNetNext = null;
     private static final Scanner scanner = new Scanner(System.in);
     boolean isStarted = false;
-    static boolean isStartedBasicDelivery = false;
 
     public Client() {
         System.out.println("client started");
@@ -35,15 +34,6 @@ public class Client {
         }
     }
 
-    public static void startCommandSender() {
-        isStartedBasicDelivery = true;
-        Thread thr = new Thread(new BasicDelivery());
-        thr.start();
-    }
-
-    public static void stop() {
-        isStartedBasicDelivery = false;
-    }
 
     public static User createUser() {
         PrintMsg("register/log in");

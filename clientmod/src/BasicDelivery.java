@@ -12,18 +12,17 @@ public class BasicDelivery implements Runnable{
 
     @Override
     public void run() {
-        while(Client.isStartedBasicDelivery){
+        System.out.println("IN DELIVERY");
+        while(ClientResponse.isStartedBasicDelivery){
             try {
-                if (!UserManager.getUserState().equals(UserState.NOT_REGISTERED)) {
+                    System.out.println("Please, enter a command to execute:");
                     String command = scanner.nextLine();
+                    if (command.equals("exit")){
+                        System.exit(0);
+                    }
                     Client.sendCommand(command);
-                } else {
-                    throw new LackOfAccessException();
-                }
-            } catch (IOException e) {
+            } catch (IOException | LackOfAccessException e) {
                 e.printStackTrace();
-            } catch (LackOfAccessException e) {
-                System.out.println("problems with registration/authorization :) ");
             }
         }
     }
