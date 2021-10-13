@@ -28,7 +28,7 @@ public class Remove extends DBCommand {
         } catch (NoSuchIdException e) {
             removeCommand.add("Error: no element with such id in collection");
         }
-        if (Server.getDatabase().removeById(id,ticket)) {
+        if (Server.getDatabase().removeById(id)) {
             collectionManager.remove(id);
             removeCommand.add("removed\n");
         } else {

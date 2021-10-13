@@ -2,6 +2,7 @@ package commands;
 
 import lib.CollectionManager;
 import models.Ticket;
+import server.Server;
 
 import java.util.ArrayList;
 
@@ -15,7 +16,7 @@ public class Show extends AbstractCommand {
     @Override
     public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
         ArrayList<String> showCommand = new ArrayList<>();
-        showCommand.add(collectionManager.getStringElements());
+        showCommand.add(String.valueOf(Server.getDatabase().getTickets()));
         showCommand.add("\nshowed\n");
         return showCommand;
     }

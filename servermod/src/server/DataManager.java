@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +19,7 @@ public class DataManager {
     private static final  Logger log = Logger.getLogger(DataManager.class.getName());
     private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private static ForkJoinPool forkJoinPool = new ForkJoinPool(4);
 
 
 
@@ -35,7 +37,7 @@ public class DataManager {
                     keyIterator.remove();
                     if (key.isValid()) {
                         if (key.isReadable()) {
-                            new ReceiveDataHandler(key).receiveData();
+                            forkJoinPool.invoke(new ReceiveDataHandler(key));
                         } else if(key.isWritable()){
                             System.out.println("IN DM THREAD: before launch request thread");
                             new Thread(new RequestDataHandler(key)).start();
@@ -57,5 +59,9 @@ public class DataManager {
 
     public static ReentrantReadWriteLock getLock() {
         return lock;
+    }
+
+    public static ForkJoinPool getForkJoinPool() {
+        return forkJoinPool;
     }
 }

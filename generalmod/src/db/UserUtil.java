@@ -14,6 +14,7 @@ import java.sql.*;
 public class UserUtil implements Util {
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String ALG = "SHA-512";
+    static String userName;
     Database database = Server.getDatabase();
 
 
@@ -26,9 +27,12 @@ public class UserUtil implements Util {
                 preparedStatement.setString(1, user.getUsername());
                 preparedStatement.setString(2, hashPassword(user));
                 preparedStatement.setString(3, user.getSalt());
+                userName = user.getUsername();
                 if (preparedStatement.executeUpdate() != 0) {
                     return true;
                 }
+            } else {
+                authorize(user);
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -39,9 +43,12 @@ public class UserUtil implements Util {
     @Override
     public boolean authorize(User user) {
         String salt = getUserSalt(user);
-        if (salt!= null){
+        String password = getUserPassword(user);
+        userName = user.getUsername();
+        if (salt!= null && password!= null){
             user.setSalt(salt);
-            if (checkHashed(user.getSalt())) {
+            user.setPassword(password);
+            if (checkHashed(user.getSalt(),user.getPassword())) {
                 System.out.println("user with such salt found in the system");
                 System.out.println("salt: " + user.getSalt());
             }
@@ -84,6 +91,25 @@ public class UserUtil implements Util {
         return salt;
     }
 
+    private String getUserPassword(User user){
+        String sql = "SELECT * FROM users";
+        String password = null;
+        if (checkUser(user)){
+            Statement st;
+            ResultSet resultSet;
+            try{
+                st = database.connection.createStatement();
+                resultSet = st.executeQuery(sql);
+                while (resultSet.next()){
+                    password = resultSet.getString("password");
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+        return password;
+    }
+
     public boolean checkUser(User user) {
         String statement = "SELECT * FROM users WHERE username=?";
         ResultSet resultSet = null;
@@ -101,13 +127,14 @@ public class UserUtil implements Util {
         return count > 0;
     }
 
-    public boolean checkHashed(String salt) {
-        String sql = "SELECT * FROM users WHERE salt=?";
+    public boolean checkHashed(String salt, String password) {
+        String sql = "SELECT * FROM users WHERE (salt=?) and (password=?)";
         ResultSet resultSet = null;
         int count = 0;
         try {
             PreparedStatement preparedStatement = database.connection.prepareStatement(sql);
             preparedStatement.setString(1, salt);
+            preparedStatement.setString(2,password);
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 count++;
@@ -148,4 +175,7 @@ public class UserUtil implements Util {
         return strSalt;
     }
 
+    public static String getUserName() {
+        return userName;
+    }
 }

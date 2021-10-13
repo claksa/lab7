@@ -13,10 +13,13 @@ import java.util.stream.Collectors;
 
 public class Database {
     private static final Logger log = Logger.getLogger(Database.class.getName());
+//    private static final String URL = "jdbc:postgresql://pg:5432/studs";
     private static final String URL = "jdbc:postgresql://localhost:5674/studs";
     private static final String LOGIN = "s312196";
     private static final String PASSWORD = "msw447";
+    String name = UserManager.getName();
     Connection connection;
+    Statement statement;
     private boolean isValid;
 
 
@@ -25,6 +28,7 @@ public class Database {
             Class.forName("org.postgresql.Driver");
             log.info("JDBC Driver has been successfully loaded");
             connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
+            statement = connection.createStatement();
             log.info("database connection successfully established");
             isValid = connection.isValid(2);
         } catch (SQLException throwables) {
@@ -41,7 +45,7 @@ public class Database {
         try {
             if (isValid()) {
                 PreparedStatement preparedStatement = connection.prepareStatement(statement);
-                preparedStatement.setString(1, UserManager.getName());
+                preparedStatement.setString(1, name);
                 preparedStatement.setDouble(2, ticket.getCoordinates().getX());
                 preparedStatement.setInt(3, ticket.getCoordinates().getY());
                 preparedStatement.setString(4, String.valueOf(ticket.getCreationDate()));
@@ -77,6 +81,27 @@ public class Database {
         return isAdded;
     }
 
+    public boolean clearCollection() {
+        String request = "TRUNCATE TABLE tickets";
+        if(execute(request)) return true;
+        return false;
+    }
+
+    public boolean execute(String request) {
+        try {
+            if(statement.execute(request)) return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean clearUsers() {
+        String request = "TRUNCATE TABLE users";
+        if(execute(request)) return true;
+        return false;
+    }
+
     public boolean checkId(Integer id){
         String statement = "SELECT FROM tickets WHERE id=?";
         ResultSet resultSet = null;
@@ -94,13 +119,13 @@ public class Database {
         return count > 0;
     }
 
-    public boolean removeById(Integer id, Ticket ticket) {
+    public boolean removeById(Integer id) {
         String statement = "DELETE FROM tickets WHERE (id = ?) AND (ticket = ?)";
         try {
             if (isValid()) {
                 PreparedStatement preparedStatement = connection.prepareStatement(statement);
                 preparedStatement.setInt(1, id);
-                preparedStatement.setString(2, ticket.getName());
+                preparedStatement.setString(2, name);
                 if (preparedStatement.executeUpdate() != 0) {
                     return true;
                 }
@@ -154,7 +179,7 @@ public class Database {
                 while (resultSet.next()) {
                     int id = resultSet.getInt("id");
                     lastId = id;
-//                    String name = resultSet.getString("ticket");
+                    String name = resultSet.getString("ticket");
                     double coordX = resultSet.getDouble("coordinate1");
                     int coordY = resultSet.getInt("coordinate2");
                     int price = resultSet.getInt("price");
@@ -175,7 +200,7 @@ public class Database {
                     Venue venue1 = new Venue(venue, capacity, venueType, address);
                     venue1.setId(venueId);
                     Coordinates coordinates = new Coordinates(coordX, coordY);
-                    Ticket ticket = new Ticket(UserManager.getName(),coordinates, price, ticketType, venue1);
+                    Ticket ticket = new Ticket(name,coordinates, price, ticketType, venue1);
                     ticket.setId(id);
                     ticket.setCreationDate(LocalDateTime.parse(date));
                     tickets.add(ticket);

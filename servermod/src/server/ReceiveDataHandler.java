@@ -8,11 +8,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.RecursiveTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ReceiveDataHandler {
+public class ReceiveDataHandler extends RecursiveTask {
     SelectionKey key;
     CommandNet receivedCommand;
     User user;
@@ -22,7 +22,7 @@ public class ReceiveDataHandler {
         this.key = key;
     }
 
-    public void receiveData() {
+    public DataHolder receiveData() {
         DataHolder data = (DataHolder) key.attachment();
         try {
             data.channel = (DatagramChannel) key.channel();
@@ -48,9 +48,15 @@ public class ReceiveDataHandler {
         if (data.getClientAdr() != null) {
             key.interestOps(SelectionKey.OP_WRITE);
         }
+        return data;
     }
 
     public SelectionKey getKey() {
         return key;
+    }
+
+    @Override
+    protected Object compute() {
+       return receiveData();
     }
 }
