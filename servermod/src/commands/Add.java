@@ -2,6 +2,7 @@ package commands;
 
 import lib.CollectionManager;
 import models.Ticket;
+import server.RequestDataHandler;
 import server.Server;
 
 import java.util.ArrayList;
@@ -16,16 +17,11 @@ public class Add extends DBCommand  {
     @Override
     public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
         ArrayList<String> addCommand = new ArrayList<>();
-        if(Server.getDatabase().isValid()) {
-            if (Server.getDatabase().addToDatabase(ticket)) {
-                collectionManager.addItem(ticket);
-                addCommand.add("the new item added to the collection\n");
-            } else {
-                addCommand.add("error with adding to the collection");
-            }
-            return addCommand;
+        if (Server.getDatabase().addToDatabase(ticket)) {
+            collectionManager.addItem(ticket);
+            addCommand.add("the new item added to the collection\n");
         } else {
-            addCommand.add(" error in adding to DB");
+            addCommand.add("error with adding to the collection");
         }
         return addCommand;
     }

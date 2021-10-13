@@ -3,6 +3,7 @@ package db;
 import exceptions.EmptyIOException;
 import mainlib.Reader;
 import models.*;
+import server.RequestDataHandler;
 import server.Server;
 
 import java.sql.*;
@@ -17,7 +18,9 @@ public class Database {
     private static final String URL = "jdbc:postgresql://localhost:5674/studs";
     private static final String LOGIN = "s312196";
     private static final String PASSWORD = "msw447";
-    String name = UserManager.getName();
+    UserManager userManager = new UserManager();
+//    private static final String PASSWORD = System.getenv().get("PASSWORD");
+    String name = userManager.getName();
     Connection connection;
     Statement statement;
     private boolean isValid;
@@ -44,8 +47,9 @@ public class Database {
         String statement = "INSERT INTO tickets(ticket, coordinate1, coordinate2, creation, price, valuation, venue, place, street, zip, coordinate3, coordinate4, coordinate5, town,capacity) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             if (isValid()) {
+                ticket.setName(userManager.getName());
                 PreparedStatement preparedStatement = connection.prepareStatement(statement);
-                preparedStatement.setString(1, name);
+                preparedStatement.setString(1, userManager.getName());
                 preparedStatement.setDouble(2, ticket.getCoordinates().getX());
                 preparedStatement.setInt(3, ticket.getCoordinates().getY());
                 preparedStatement.setString(4, String.valueOf(ticket.getCreationDate()));
@@ -200,9 +204,10 @@ public class Database {
                     Venue venue1 = new Venue(venue, capacity, venueType, address);
                     venue1.setId(venueId);
                     Coordinates coordinates = new Coordinates(coordX, coordY);
-                    Ticket ticket = new Ticket(name,coordinates, price, ticketType, venue1);
+                    Ticket ticket = new Ticket(coordinates, price, ticketType, venue1);
                     ticket.setId(id);
                     ticket.setCreationDate(LocalDateTime.parse(date));
+                    ticket.setName(name);
                     tickets.add(ticket);
                 }
                 Ticket.setLastId(lastId);
@@ -224,5 +229,9 @@ public class Database {
 
     public Connection getConnection() {
         return connection;
+    }
+
+    public UserManager getUserManager() {
+        return userManager;
     }
 }

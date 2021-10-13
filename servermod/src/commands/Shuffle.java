@@ -24,7 +24,7 @@ public class Shuffle extends AbstractCommand {
     @Override
     public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
         ArrayList<String> shuffleCommand = new ArrayList<>();
-        Collections.shuffle(Server.getDatabase().getTickets());
+        collectionManager.shuffle();
         shuffleCommand.add("shuffled\n");
         return shuffleCommand;
     }

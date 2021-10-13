@@ -42,9 +42,6 @@ public class TicketFactory extends Reader {
         Coordinates coordinates = new Coordinates(x, y);
 
 
-//        LocalDateTime time = LocalDateTime.now();
-//        PrintMsg("CreationDate " + time);
-
         Integer price;
         while (true) {
             price = readInteger("Enter the price of the ticket (integer format):");
@@ -57,7 +54,7 @@ public class TicketFactory extends Reader {
 
         TicketType ticketType = readEnumType(TicketType.class, "Enter a ticket type:");
 
-        return new Ticket(UserManager.getName(),coordinates, price, ticketType, getVenueObj());
+        return new Ticket(coordinates, price, ticketType, getVenueObj());
     }
 
     /**
@@ -66,7 +63,6 @@ public class TicketFactory extends Reader {
      */
 
     private Venue getVenueObj() {
-        PrintMsg("Venue ID: " );
 
         String venueName = readString("Enter a venue name:");
         Integer capacity;

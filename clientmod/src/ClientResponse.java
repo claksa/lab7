@@ -55,7 +55,6 @@ public class ClientResponse implements Runnable {
                 boolean ded = answer.getAnswerType().equals(WIN) && answer.getUserState().equals(AUTHORIZED);
                 System.out.println(ded);
                 if (ded) {
-                    System.out.println("i would like to send command!");
                     startCommandSender();
                 }
 
@@ -85,7 +84,6 @@ public class ClientResponse implements Runnable {
 
     public void startCommandSender() {
         isStartedBasicDelivery = true;
-        System.out.println("IN CLIENT: ");
         Thread thr = new Thread(new BasicDelivery());
         thr.start();
     }

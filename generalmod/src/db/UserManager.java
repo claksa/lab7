@@ -40,7 +40,7 @@ public class UserManager implements Util {
         return userState;
     }
 
-    public static String getName() {
+    public String getName() {
         return name;
     }
 

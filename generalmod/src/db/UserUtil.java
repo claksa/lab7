@@ -15,7 +15,6 @@ public class UserUtil implements Util {
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String ALG = "SHA-512";
     static String userName;
-    Database database = Server.getDatabase();
 
 
     @Override
@@ -23,7 +22,7 @@ public class UserUtil implements Util {
         String statement = "INSERT INTO users (username,password,salt) VALUES(?,?,?)";
         try {
             if (!checkUser(user)) {
-                PreparedStatement preparedStatement = database.connection.prepareStatement(statement);
+                PreparedStatement preparedStatement = Server.getDatabase().connection.prepareStatement(statement);
                 preparedStatement.setString(1, user.getUsername());
                 preparedStatement.setString(2, hashPassword(user));
                 preparedStatement.setString(3, user.getSalt());
@@ -45,10 +44,10 @@ public class UserUtil implements Util {
         String salt = getUserSalt(user);
         String password = getUserPassword(user);
         userName = user.getUsername();
-        if (salt!= null && password!= null){
+        if (salt != null && password != null) {
             user.setSalt(salt);
             user.setPassword(password);
-            if (checkHashed(user.getSalt(),user.getPassword())) {
+            if (checkHashed(user.getSalt(), user.getPassword())) {
                 System.out.println("user with such salt found in the system");
                 System.out.println("salt: " + user.getSalt());
             }
@@ -61,7 +60,7 @@ public class UserUtil implements Util {
         String statement = "SELECT * FROM users WHERE username = ? AND PASSWORD = ? AND SALT = ?";
         ResultSet resultSet = null;
         try {
-            PreparedStatement preparedStatement = database.connection.prepareStatement(statement);
+            PreparedStatement preparedStatement = Server.getDatabase().connection.prepareStatement(statement);
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.setString(3, user.getSalt());
@@ -72,16 +71,16 @@ public class UserUtil implements Util {
         return resultSet;
     }
 
-    private String getUserSalt(User user){
+    private String getUserSalt(User user) {
         String sql = "SELECT * FROM users";
         String salt = null;
-        if (checkUser(user)){
+        if (checkUser(user)) {
             Statement st;
             ResultSet resultSet;
-            try{
-                st = database.connection.createStatement();
+            try {
+                st = Server.getDatabase().connection.createStatement();
                 resultSet = st.executeQuery(sql);
-                while (resultSet.next()){
+                while (resultSet.next()) {
                     salt = resultSet.getString("salt");
                 }
             } catch (SQLException throwables) {
@@ -91,16 +90,16 @@ public class UserUtil implements Util {
         return salt;
     }
 
-    private String getUserPassword(User user){
+    private String getUserPassword(User user) {
         String sql = "SELECT * FROM users";
         String password = null;
-        if (checkUser(user)){
+        if (checkUser(user)) {
             Statement st;
             ResultSet resultSet;
-            try{
-                st = database.connection.createStatement();
+            try {
+                st = Server.getDatabase().connection.createStatement();
                 resultSet = st.executeQuery(sql);
-                while (resultSet.next()){
+                while (resultSet.next()) {
                     password = resultSet.getString("password");
                 }
             } catch (SQLException throwables) {
@@ -115,7 +114,7 @@ public class UserUtil implements Util {
         ResultSet resultSet = null;
         int count = 0;
         try {
-            PreparedStatement preparedStatement = database.connection.prepareStatement(statement);
+            PreparedStatement preparedStatement = Server.getDatabase().connection.prepareStatement(statement);
             preparedStatement.setString(1, user.getUsername());
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -124,7 +123,7 @@ public class UserUtil implements Util {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return count > 0;
+            return count > 0;
     }
 
     public boolean checkHashed(String salt, String password) {
@@ -132,9 +131,9 @@ public class UserUtil implements Util {
         ResultSet resultSet = null;
         int count = 0;
         try {
-            PreparedStatement preparedStatement = database.connection.prepareStatement(sql);
+            PreparedStatement preparedStatement = Server.getDatabase().connection.prepareStatement(sql);
             preparedStatement.setString(1, salt);
-            preparedStatement.setString(2,password);
+            preparedStatement.setString(2, password);
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 count++;
@@ -153,7 +152,6 @@ public class UserUtil implements Util {
             digest = MessageDigest.getInstance(ALG);
             byte[] generatedSalt = generateSalt(4);
             user.setSalt(getStringSalt(generatedSalt));
-//            usersSalt = getStringSalt(generatedSalt);
             digest.update(generatedSalt);
             byte[] hash = digest.digest(user.getPassword().getBytes(StandardCharsets.UTF_8));
             hashPassword = DatatypeConverter.printHexBinary(hash).toLowerCase();

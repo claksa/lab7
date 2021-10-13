@@ -18,6 +18,7 @@ public class CommandNet  implements Serializable {
         }
         if (enteredCommand[0].equals("add") |enteredCommand[0].equals("addmin") | enteredCommand[0].equals("update") | enteredCommand[0].equals("removelower")){
             this.ticket = ticketFactory.getTicketObj();
+            this.ticket.setName(Answer.getUsername());
         }
     }
 
@@ -32,6 +33,8 @@ public class CommandNet  implements Serializable {
     public Integer getId() {
         return id;
     }
+
+
 
 
 }

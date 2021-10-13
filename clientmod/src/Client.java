@@ -1,8 +1,6 @@
 import exceptions.EmptyIOException;
 import mainlib.User;
 import db.UserAct;
-import db.UserManager;
-import db.UserState;
 import exceptions.LackOfAccessException;
 import mainlib.*;
 
@@ -70,28 +68,6 @@ public class Client {
     }
 
 
-//    public void run() {
-//        try {
-//            while (true) {
-//                if (!isStarted) {
-//                    startClient();
-//                }
-////                String line = scanner.nextLine();
-////                if (line.equals("exit")) {
-////                    System.exit(0);
-////                }
-////                sendCommand(line);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-////        catch (LackOfAccessException e) {
-////            PrintErr("you cannot send commands if you are not logged in");
-////        } catch (IOException e) {
-////            e.printStackTrace();
-////        }
-//    }
-
     public void startClient() {
         if (isStarted) {
             PrintMsg("the client has already connected to server");
@@ -105,7 +81,6 @@ public class Client {
 
     public static void sendCommand(String line) throws IOException, LackOfAccessException {
         String[] message = (line.trim() + " ").split(" ", 2);
-        System.out.println("line in client: " + line);
         CommandNet cmd = new CommandNet(message);
         send(cmd);
     }
@@ -141,6 +116,5 @@ public class Client {
         }
         System.out.println("client send command to server");
     }
-
 
 }

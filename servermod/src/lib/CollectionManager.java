@@ -3,6 +3,7 @@ package lib;
 import exceptions.EmptyIOException;
 import models.Ticket;
 import models.TicketType;
+import server.RequestDataHandler;
 import server.Server;
 
 import java.time.ZonedDateTime;
@@ -18,6 +19,14 @@ public class CollectionManager {
         this.tickets = Server.getDatabase().getTickets();
         setIdList();
         sortCollection();
+    }
+
+    public String show(){
+        return String.valueOf(tickets);
+    }
+
+    public void shuffle(){
+        Collections.shuffle(tickets);
     }
 
 
@@ -90,4 +99,7 @@ public class CollectionManager {
         }
     }
 
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
 }

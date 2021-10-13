@@ -14,8 +14,7 @@ public class Ticket implements Serializable {
     private final Venue venue;
     private static Integer lastId = 0;
 
-    public Ticket(String name,Coordinates coordinates, int price, TicketType type, Venue venue) {
-        this.name = name;
+    public Ticket(Coordinates coordinates, int price, TicketType type, Venue venue) {
         this.coordinates = coordinates;
         this.creationDate = LocalDateTime.now();
         this.price = price;
@@ -23,15 +22,6 @@ public class Ticket implements Serializable {
         this.venue = venue;
         this.id = getIncLastId();
     }
-
-//    private void generateId(){
-//        for (Integer id: CollectionManager.getIds()) {
-//            if (id.equals(this.id)){
-//                this.id = getIncLastId();
-//            }
-//        }
-//    }
-
 
 
     private static Integer getIncLastId(){

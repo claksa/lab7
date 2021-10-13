@@ -1,7 +1,6 @@
 package server;
 
 import commands.Executor;
-import db.UserAct;
 import db.UserManager;
 import db.UserState;
 import exceptions.EmptyIOException;
@@ -16,6 +15,8 @@ import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import static db.UserAct.LOG_IN;
+import static db.UserAct.REGISTER;
 import static db.UserState.AUTHORIZED;
 import static mainlib.AnswerType.ERROR;
 import static mainlib.AnswerType.WIN;
@@ -24,9 +25,9 @@ public class RequestDataHandler implements Runnable {
     SelectionKey key;
     DataHolder dataHolder;
     CommandNet commandNet;
-    static User user;
     AnswerType answerType;
     UserState userState;
+    volatile UserManager um = Server.getDatabase().getUserManager();
     private static final Logger log = Logger.getLogger(ReceiveDataHandler.class.getName());
 
     public RequestDataHandler(SelectionKey key) {
@@ -45,7 +46,6 @@ public class RequestDataHandler implements Runnable {
             if (dataHolder == null) {
                 throw new ClassNotFoundException();
             }
-            System.out.println("IN REQUEST DATA");
             dataHolder.getBuffer().flip();
             Object received = dataHolder.getReceivedData();
             if (received == null) {
@@ -64,11 +64,10 @@ public class RequestDataHandler implements Runnable {
                     answerType = WIN;
                 }
             } else if (received instanceof User) {
-                user = (User) received;
+                User thisUser = (User) received;
                 ArrayList<String> answerList = new ArrayList<>();
-                UserManager userManager = new UserManager();
-                if (user.getUserAct().equals(UserAct.REGISTER)) {
-                    if (userManager.register(user)) {
+                if (thisUser.getUserAct().equals(REGISTER)) {
+                    if (um.register(thisUser)) {
                         answerList.add("registered");
                         userState = AUTHORIZED;
                         answerType = WIN;
@@ -76,8 +75,8 @@ public class RequestDataHandler implements Runnable {
                         answerList.add("problems with registration.\nMost likely you are already in the system! try to log in:");
                         answerType = ERROR;
                     }
-                } else if (user.getUserAct().equals(UserAct.LOG_IN)) {
-                    if (userManager.authorize(user)) {
+                } else if (thisUser.getUserAct().equals(LOG_IN)) {
+                    if (um.authorize(thisUser)) {
                         answerList.add("authorized");
                         userState = AUTHORIZED;
                         answerType = WIN;
@@ -87,6 +86,9 @@ public class RequestDataHandler implements Runnable {
                     }
                 }
                 answer = new Answer(answerList, answerType);
+                if (thisUser.getUsername() != null) {
+                    answer.setUsername(thisUser.getUsername());
+                }
                 answer.setUserState(userState);
             }
             oos.writeObject(answer);
@@ -105,7 +107,4 @@ public class RequestDataHandler implements Runnable {
         }
     }
 
-    public static User getUser() {
-        return user;
-    }
 }

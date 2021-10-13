@@ -11,6 +11,7 @@ public class Answer implements Serializable {
     private final ArrayList<String> answer;
     AnswerType answerType;
     UserState userState;
+    static String username;
 
     public Answer(ArrayList<String> answer, AnswerType answerType) {
         this.answer = answer;
@@ -20,10 +21,6 @@ public class Answer implements Serializable {
 
     public ArrayList<String> getAnswer() {
         return answer;
-    }
-
-    public void setAnswerStatus(AnswerType answerType) {
-        this.answerType = answerType;
     }
 
     public AnswerType getAnswerType() {
@@ -40,6 +37,14 @@ public class Answer implements Serializable {
 
     public void setUserState(UserState userState) {
         this.userState = userState;
+    }
+
+    public static String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override

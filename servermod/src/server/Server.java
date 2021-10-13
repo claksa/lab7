@@ -2,6 +2,7 @@ package server;
 
 
 import db.Database;
+import db.UserManager;
 import exceptions.EmptyIOException;
 import lib.CommandFactory;
 import lib.ListHolder;
@@ -14,18 +15,18 @@ import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 public class Server {
     DatagramChannel channel;
-    static Database database = new Database();
     static Selector selector;
     public static boolean running = false;
     private static final int PORT = 9000;
+    static volatile Database database = new Database();
     private static final Logger log = Logger.getLogger(Server.class.getName());
+
 
 
     public void startServer() {

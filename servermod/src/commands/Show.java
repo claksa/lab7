@@ -16,7 +16,7 @@ public class Show extends AbstractCommand {
     @Override
     public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
         ArrayList<String> showCommand = new ArrayList<>();
-        showCommand.add(String.valueOf(Server.getDatabase().getTickets()));
+        showCommand.add(collectionManager.show());
         showCommand.add("\nshowed\n");
         return showCommand;
     }
