@@ -3,7 +3,6 @@ package db;
 import exceptions.EmptyIOException;
 import mainlib.Reader;
 import models.*;
-import server.RequestDataHandler;
 import server.Server;
 
 import java.sql.*;
@@ -17,10 +16,8 @@ public class Database {
 //    private static final String URL = "jdbc:postgresql://pg:5432/studs";
     private static final String URL = "jdbc:postgresql://localhost:5674/studs";
     private static final String LOGIN = "s312196";
-    private static final String PASSWORD = "msw447";
     UserManager userManager = new UserManager();
-//    private static final String PASSWORD = System.getenv().get("PASSWORD");
-    String name = userManager.getName();
+    private static final String PASSWORD = System.getenv().get("PASSWORD");
     Connection connection;
     Statement statement;
     private boolean isValid;
@@ -87,8 +84,7 @@ public class Database {
 
     public boolean clearCollection() {
         String request = "TRUNCATE TABLE tickets";
-        if(execute(request)) return true;
-        return false;
+        return execute(request);
     }
 
     public boolean execute(String request) {
@@ -100,11 +96,6 @@ public class Database {
         return false;
     }
 
-    public boolean clearUsers() {
-        String request = "TRUNCATE TABLE users";
-        if(execute(request)) return true;
-        return false;
-    }
 
     public boolean checkId(Integer id){
         String statement = "SELECT FROM tickets WHERE id=?";
@@ -129,7 +120,7 @@ public class Database {
             if (isValid()) {
                 PreparedStatement preparedStatement = connection.prepareStatement(statement);
                 preparedStatement.setInt(1, id);
-                preparedStatement.setString(2, name);
+                preparedStatement.setString(2, userManager.getName());
                 if (preparedStatement.executeUpdate() != 0) {
                     return true;
                 }
@@ -140,13 +131,13 @@ public class Database {
         return false;
     }
 
-    public boolean removeByLowerId(Ticket ticket, Integer id) {
+    public boolean removeByLowerId(Integer id) {
         String statement = "DELETE FROM tickets WHERE (id < ?) AND (ticket=?)";
         if (isValid()) {
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement(statement);
                 preparedStatement.setInt(1, id);
-                preparedStatement.setString(2, ticket.getName());
+                preparedStatement.setString(2, userManager.getName());
                 if (preparedStatement.executeUpdate() != 0) {
                     return true;
                 }
@@ -157,13 +148,11 @@ public class Database {
         return false;
     }
 
-    public boolean updateCollection(Ticket update){
-        boolean isUpdated = false;
+    public void updateCollection(Ticket update){
         List<Ticket> tickets = getTickets().stream().map(ticket -> ticket.getId().equals(update.getId()) ? update : ticket).collect(Collectors.toCollection(Vector::new));
         for (Ticket t: tickets){
-            isUpdated = addToDatabase(t);
+            addToDatabase(t);
         }
-        return isUpdated;
     }
 
 

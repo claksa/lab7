@@ -6,7 +6,7 @@ import server.Server;
 
 import java.util.ArrayList;
 
-public class RemoveLower extends DBCommand {
+public class RemoveLower extends AbstractCommand {
     private final CollectionManager collectionManager;
 
     public RemoveLower(CollectionManager collectionManager) {
@@ -17,11 +17,10 @@ public class RemoveLower extends DBCommand {
     public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
         ArrayList<String> removeLowerCommand = new ArrayList<>();
         if (Server.getDatabase().checkId(id)) {
-            if(Server.getDatabase().removeByLowerId(ticket,id)) {
-                collectionManager.removeIfLowerId(ticket);
+            if(Server.getDatabase().removeByLowerId(id)) {
                 removeLowerCommand.add("removed\n");
             } else {
-                removeLowerCommand.add("Theres is no elements to remove");
+                removeLowerCommand.add("error in removing");
             }
         } else {
             removeLowerCommand.add("This id already exists! Enter less");
@@ -35,8 +34,4 @@ public class RemoveLower extends DBCommand {
         return " remove all elements from the collection that are less than the given one\n";
     }
 
-    @Override
-    void connectToDB() {
-
-    }
 }

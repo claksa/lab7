@@ -13,7 +13,6 @@ import java.net.PortUnreachableException;
 import java.util.Scanner;
 
 import static db.UserState.AUTHORIZED;
-import static db.UserState.NOT_REGISTERED;
 import static mainlib.AnswerType.ERROR;
 import static mainlib.AnswerType.WIN;
 import static mainlib.Reader.PrintErr;
@@ -53,8 +52,8 @@ public class ClientResponse implements Runnable {
                     Client.sendUser();
                 }
                 boolean ded = answer.getAnswerType().equals(WIN) && answer.getUserState().equals(AUTHORIZED);
-                System.out.println(ded);
                 if (ded) {
+                    System.out.println("Please, enter a command to send");
                     startCommandSender();
                 }
 

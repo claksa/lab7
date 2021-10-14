@@ -6,7 +6,7 @@ import server.Server;
 
 import java.util.ArrayList;
 
-public class AddMin extends DBCommand {
+public class AddMin extends AbstractCommand {
     CollectionManager collectionManager;
 
     public AddMin(CollectionManager collectionManager) {
@@ -16,11 +16,10 @@ public class AddMin extends DBCommand {
     @Override
     public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
         ArrayList<String> addMinCommand = new ArrayList<>();
-        if (Server.getDatabase().isValid()){
+        if (Server.getDatabase().isValid()) {
             if (Server.getDatabase().checkId(id)) {
                 if (Server.getDatabase().addIfMin(ticket)) {
-                    collectionManager.addItem(ticket);
-                    addMinCommand.add("min item added\n");
+                    addMinCommand.add("an element smaller than the entered ID does not exist --> " + "your ticket successfully added");
                 } else {
                     addMinCommand.add("error with adding");
                 }
@@ -36,8 +35,4 @@ public class AddMin extends DBCommand {
         return " add a new item to a collection if its value is less than the smallest item in this collection\n";
     }
 
-    @Override
-    void connectToDB() {
-
-    }
 }

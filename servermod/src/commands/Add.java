@@ -7,7 +7,7 @@ import server.Server;
 
 import java.util.ArrayList;
 
-public class Add extends DBCommand  {
+public class Add extends AbstractCommand {
     private final CollectionManager collectionManager;
 
     public Add(CollectionManager collectionManager) {
@@ -31,9 +31,4 @@ public class Add extends DBCommand  {
         return "add new element to collection\n";
     }
 
-    @Override
-    void connectToDB() {
-
-
-    }
 }

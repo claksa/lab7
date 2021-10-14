@@ -8,7 +8,7 @@ import server.Server;
 
 import java.util.ArrayList;
 
-public class Remove extends DBCommand {
+public class Remove extends AbstractCommand {
     private final CollectionManager collectionManager;
 
 
@@ -22,17 +22,16 @@ public class Remove extends DBCommand {
         ArrayList<String> removeCommand = new ArrayList<>();
         try {
             if (argument.trim().isEmpty()) throw new EmptyIOException();
-            if (Server.getDatabase().checkId(id)) throw new NoSuchIdException();
+            if (!Server.getDatabase().checkId(id)) throw new NoSuchIdException();
+            if (Server.getDatabase().removeById(id)){
+                removeCommand.add("ticket with such id ("+ id + ") successfully removed");
+            } else {
+                removeCommand.add("difficulties with deleting such an ID in the database. Perhaps the ticket with this ID does not belong to your user!");
+            }
         } catch (EmptyIOException e) {
             removeCommand.add("Error: you entered a null-argument");
         } catch (NoSuchIdException e) {
             removeCommand.add("Error: no element with such id in collection");
-        }
-        if (Server.getDatabase().removeById(id)) {
-            collectionManager.remove(id);
-            removeCommand.add("removed\n");
-        } else {
-            removeCommand.add("problems with removing");
         }
         return removeCommand;
     }
@@ -42,8 +41,4 @@ public class Remove extends DBCommand {
         return " (id) remove an item from the collection by its id\n";
     }
 
-    @Override
-    void connectToDB() {
-
-    }
 }

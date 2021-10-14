@@ -22,16 +22,16 @@ public class CollectionManager {
     }
 
     public String show(){
-        return String.valueOf(tickets);
+        return String.valueOf(getTickets());
     }
 
     public void shuffle(){
-        Collections.shuffle(tickets);
+        Collections.shuffle(getTickets());
     }
 
 
     public void setIdList(){
-        ids = tickets.stream().map(Ticket::getId).collect(Collectors.toList());
+        ids = getTickets().stream().map(Ticket::getId).collect(Collectors.toList());
     }
 
     public static List<Integer> getIds() {
@@ -39,9 +39,9 @@ public class CollectionManager {
     }
 
     public String getInformation() {
-        String dataSimpleName = tickets.getClass().getSimpleName();
+        String dataSimpleName = getTickets().getClass().getSimpleName();
         ZonedDateTime creationDate = ZonedDateTime.now();
-        String size = String.valueOf(tickets.size());
+        String size = String.valueOf(getTickets().size());
         String res = "";
         res += "\n" + "collection type: " + dataSimpleName + "\n";
         res += "collection creation time: " + creationDate + "\n";
@@ -49,57 +49,38 @@ public class CollectionManager {
         return res;
     }
 
-    public String getStringElements() {
-        return String.valueOf(tickets);
-    }
-
-
-    public void addItem(Ticket ticket) {
-          tickets.add(ticket);
-    }
-
 
     public String startsWithSubstring(String substr) {
         StringBuilder list = new StringBuilder();
-        tickets.stream().filter((s) -> s.getName().startsWith(substr.trim())).forEach(list::append);
+        getTickets().stream().filter((s) -> s.getName().startsWith(substr.trim())).forEach(list::append);
         return list.toString();
     }
 
     public String containsSomeSubstring(String substr) {
         StringBuilder list = new StringBuilder();
-        tickets.stream().filter((s) -> s.getName().contains(substr.trim())).forEach(list::append);
+        getTickets().stream().filter((s) -> s.getName().contains(substr.trim())).forEach(list::append);
         return list.toString();
     }
 
-    public void clear() {
-        tickets.clear();
-    }
 
     public ArrayList<String> groupCount() {
         ArrayList<String> out = new ArrayList<>();
-        Map<TicketType, Long> ticketsByType = tickets.stream().collect(Collectors.groupingBy(Ticket::getType, Collectors.counting()));
+        Map<TicketType, Long> ticketsByType = getTickets().stream().collect(Collectors.groupingBy(Ticket::getType, Collectors.counting()));
         for (Map.Entry<TicketType, Long> item : ticketsByType.entrySet()) {
             out.add(item.getKey() + " - " + item.getValue());
         }
         return out;
     }
 
-    public boolean remove(Integer id) {
-        return tickets.removeIf(t -> t.getId().equals(id));
-    }
-
-
-    public boolean removeIfLowerId(Ticket ticket) {
-        return tickets.removeIf(ticket1 -> (ticket.getId() > ticket1.getId()));
-    }
 
     public void sortCollection() {
-        if (!tickets.isEmpty()) {
-            tickets = tickets.stream().sorted((Comparator.comparing(o -> o.getVenue().getType()))).collect(Collectors.toList());
+        if (!getTickets().isEmpty()) {
+            tickets = getTickets().stream().sorted((Comparator.comparing(o -> o.getVenue().getType()))).collect(Collectors.toList());
         }
     }
 
+
     public List<Ticket> getTickets() {
-        return tickets;
+        return Server.getDatabase().getTickets();
     }
 }
