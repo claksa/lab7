@@ -5,33 +5,33 @@ import mainlib.User;
 import server.Server;
 
 import javax.xml.bind.DatatypeConverter;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class UserUtil implements Util {
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String ALG = "SHA-512";
-    static String userName;
+    private String userSalt;
+    private String userPepper;
+    private final HashMap<String, String> usersPeppers = new HashMap<>();
 
 
     @Override
     public boolean register(User user) {
         String statement = "INSERT INTO users (username,password,salt) VALUES(?,?,?)";
         try {
-            if (!checkUser(user)) {
-                PreparedStatement preparedStatement = Server.getDatabase().connection.prepareStatement(statement);
-                preparedStatement.setString(1, user.getUsername());
-                preparedStatement.setString(2, hashPassword(user));
-                preparedStatement.setString(3, user.getSalt());
-                userName = user.getUsername();
-                if (preparedStatement.executeUpdate() != 0) {
-                    return true;
-                }
-            } else {
-                authorize(user);
+            PreparedStatement preparedStatement = Server.getDatabase().connection.prepareStatement(statement);
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setString(2, getStringHash(generateHash(user)));
+            preparedStatement.setString(3, userSalt);
+            if (preparedStatement.executeUpdate() != 0) {
+                usersPeppers.put(user.getUsername(), userPepper);
+                return true;
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -41,70 +41,28 @@ public class UserUtil implements Util {
 
     @Override
     public boolean authorize(User user) {
-        String salt = getUserSalt(user);
-        String password = getUserPassword(user);
-        userName = user.getUsername();
-        if (salt != null && password != null) {
-            user.setSalt(salt);
-            user.setPassword(password);
-            if (checkHashed(user.getSalt(), user.getPassword())) {
-                System.out.println("user with such salt found in the system");
-                System.out.println("salt: " + user.getSalt());
+        for (Map.Entry<String, String> item : usersPeppers.entrySet()) {
+            if (item.getKey().equals(user.getUsername()) && item.getValue()!=null){
+                return true;
             }
-            return true;
         }
         return false;
     }
 
-    public ResultSet getUser(User user) {
-        String statement = "SELECT * FROM users WHERE username = ? AND PASSWORD = ? AND SALT = ?";
-        ResultSet resultSet = null;
-        try {
-            PreparedStatement preparedStatement = Server.getDatabase().connection.prepareStatement(statement);
-            preparedStatement.setString(1, user.getUsername());
-            preparedStatement.setString(2, user.getPassword());
-            preparedStatement.setString(3, user.getSalt());
-            resultSet = preparedStatement.executeQuery();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return resultSet;
-    }
 
-    private String getUserSalt(User user) {
-        String sql = "SELECT * FROM users";
-        String salt = null;
-        if (checkUser(user)) {
-            Statement st;
-            ResultSet resultSet;
-            try {
-                st = Server.getDatabase().connection.createStatement();
-                resultSet = st.executeQuery(sql);
-                while (resultSet.next()) {
-                    salt = resultSet.getString("salt");
-                }
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        }
-        return salt;
-    }
-
-    private String getUserPassword(User user) {
+    private String getUserHash(User user) {
         String sql = "SELECT * FROM users";
         String password = null;
-        if (checkUser(user)) {
-            Statement st;
-            ResultSet resultSet;
-            try {
-                st = Server.getDatabase().connection.createStatement();
-                resultSet = st.executeQuery(sql);
-                while (resultSet.next()) {
-                    password = resultSet.getString("password");
-                }
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+        Statement st;
+        ResultSet resultSet;
+        try {
+            st = Server.getDatabase().connection.createStatement();
+            resultSet = st.executeQuery(sql);
+            while (resultSet.next()) {
+                password = resultSet.getString("password");
             }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
         return password;
     }
@@ -123,57 +81,43 @@ public class UserUtil implements Util {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-            return count > 0;
-    }
-
-    public boolean checkHashed(String salt, String password) {
-        String sql = "SELECT * FROM users WHERE (salt=?) and (password=?)";
-        ResultSet resultSet = null;
-        int count = 0;
-        try {
-            PreparedStatement preparedStatement = Server.getDatabase().connection.prepareStatement(sql);
-            preparedStatement.setString(1, salt);
-            preparedStatement.setString(2, password);
-            resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                count++;
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
         return count > 0;
     }
 
 
-    private String hashPassword(User user) {
-        MessageDigest digest;
-        String hashPassword = null;
+    private byte[] generateHash(User user) {
+        MessageDigest md = null;
+        byte[] hash = null;
         try {
-            digest = MessageDigest.getInstance(ALG);
-            byte[] generatedSalt = generateSalt(4);
-            user.setSalt(getStringSalt(generatedSalt));
-            digest.update(generatedSalt);
-            byte[] hash = digest.digest(user.getPassword().getBytes(StandardCharsets.UTF_8));
-            hashPassword = DatatypeConverter.printHexBinary(hash).toLowerCase();
+            md = MessageDigest.getInstance(ALG);
+            String password = user.getPassword();
+            userSalt = getStringSalt(generateSalt());
+            userPepper = generatePepper();
+            hash = md.digest((userPepper + password + userSalt).getBytes());
         } catch (NoSuchAlgorithmException e) {
             Reader.PrintErr("no such encryption algorithm: " + ALG);
         }
-        return hashPassword;
+        return hash;
     }
 
-    private byte[] generateSalt(int length) {
-        byte[] salt = new byte[length];
+    private byte[] generateSalt(){
+        byte[] salt = new byte[6];
         RANDOM.nextBytes(salt);
         return salt;
     }
 
-
-    public String getStringSalt(byte[] salt) {
-        String strSalt = DatatypeConverter.printHexBinary(salt).toLowerCase();
-        return strSalt;
+    private String generatePepper() {
+        return UUID.randomUUID().toString();
     }
 
-    public static String getUserName() {
-        return userName;
+
+    private String getStringSalt(byte[] salt) {
+        return DatatypeConverter.printHexBinary(salt);
     }
+
+    private String getStringHash(byte[] hash) {
+        return DatatypeConverter.printHexBinary(hash);
+    }
+
+
 }

@@ -17,7 +17,7 @@ public class Database {
     private static final String URL = "jdbc:postgresql://localhost:5674/studs";
     private static final String LOGIN = "s312196";
     UserManager userManager = new UserManager();
-    private static final String PASSWORD = System.getenv().get("PASSWORD");
+//    private static final String PASSWORD = System.getenv().get("PASSWORD");
     Connection connection;
     Statement statement;
     private boolean isValid;
@@ -27,7 +27,7 @@ public class Database {
         try {
             Class.forName("org.postgresql.Driver");
             log.info("JDBC Driver has been successfully loaded");
-            connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
+            connection = DriverManager.getConnection(URL, LOGIN, "msw447");
             statement = connection.createStatement();
             log.info("database connection successfully established");
             isValid = connection.isValid(2);

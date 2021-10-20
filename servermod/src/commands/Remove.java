@@ -24,9 +24,9 @@ public class Remove extends AbstractCommand {
             if (argument.trim().isEmpty()) throw new EmptyIOException();
             if (!Server.getDatabase().checkId(id)) throw new NoSuchIdException();
             if (Server.getDatabase().removeById(id)){
-                removeCommand.add("ticket with such id ("+ id + ") successfully removed");
+                removeCommand.add("ticket with such ID ("+ id + ") successfully removed");
             } else {
-                removeCommand.add("difficulties with deleting such an ID in the database. Perhaps the ticket with this ID does not belong to your user!");
+                removeCommand.add("Error: difficulties with deleting a ticket with such ID ("+ id + ") in the database. Perhaps the ticket with this ID does not belong to you!");
             }
         } catch (EmptyIOException e) {
             removeCommand.add("Error: you entered a null-argument");

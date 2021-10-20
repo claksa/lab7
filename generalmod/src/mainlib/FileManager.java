@@ -1,8 +1,5 @@
 package mainlib;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 import exceptions.EmptyIOException;
 import exceptions.IncorrectValueException;
 import exceptions.LackOfAccessException;
@@ -28,63 +25,63 @@ public class FileManager {
      * the collection to be loaded into the file
      * @return vector
      */
-    public Vector<Ticket> readData() {
-
-        Gson gson = new Gson();
-        try {
-            if (!Files.isReadable(Paths.get(PATH))) {
-                throw new LackOfAccessException();
-            }
-            BufferedReader reader = new BufferedReader(new FileReader(PATH));
-            Type dataType = new TypeToken<Vector<Ticket>>() {
-            }.getType();
-            String json = reader.readLine();
-            if (json == null) {
-                return new Vector<>();
-            }
-            Vector<Ticket> data = gson.fromJson(json.trim(), dataType);
-            mainlib.Reader.PrintMsg("Collection read from file");
-            return data;
-        } catch (FileNotFoundException e) {
-            mainlib.Reader.PrintErr(" file not found");
-        } catch (NoSuchElementException e) {
-            mainlib.Reader.PrintErr("file is empty");
-        } catch (JsonParseException e) {
-            mainlib.Reader.PrintErr("Another collection in the file");
-        } catch (LackOfAccessException e) {
-            mainlib.Reader.PrintErr("no read rights");
-        } catch (IOException e) {
-            mainlib.Reader.PrintErr(" Houston, have problems. IOException...");
-        }
-        return new Vector<>();
-    }
+//    public Vector<Ticket> readData() {
+//
+//        Gson gson = new Gson();
+//        try {
+//            if (!Files.isReadable(Paths.get(PATH))) {
+//                throw new LackOfAccessException();
+//            }
+//            BufferedReader reader = new BufferedReader(new FileReader(PATH));
+//            Type dataType = new TypeToken<Vector<Ticket>>() {
+//            }.getType();
+//            String json = reader.readLine();
+//            if (json == null) {
+//                return new Vector<>();
+//            }
+//            Vector<Ticket> data = gson.fromJson(json.trim(), dataType);
+//            mainlib.Reader.PrintMsg("Collection read from file");
+//            return data;
+//        } catch (FileNotFoundException e) {
+//            mainlib.Reader.PrintErr(" file not found");
+//        } catch (NoSuchElementException e) {
+//            mainlib.Reader.PrintErr("file is empty");
+//        } catch (JsonParseException e) {
+//            mainlib.Reader.PrintErr("Another collection in the file");
+//        } catch (LackOfAccessException e) {
+//            mainlib.Reader.PrintErr("no read rights");
+//        } catch (IOException e) {
+//            mainlib.Reader.PrintErr(" Houston, have problems. IOException...");
+//        }
+//        return new Vector<>();
+//    }
 
     /**
      * saves collection to file
      *
      * @param tickets is a collection to save
      */
-    public void saveData(List<Ticket> tickets) {
-
-        /*GsonBuilder builder = new GsonBuilder();
-        builder.serializeNulls();
-        Gson gson = builder.setPrettyPrinting().create();*/
-
-        Gson gson = new Gson();
-        try {
-            if (!Files.isWritable(Paths.get(PATH))) {
-                throw new LackOfAccessException();
-            }
-            BufferedWriter writer = new BufferedWriter(new FileWriter(PATH));
-            writer.write(gson.toJson(tickets));
-            mainlib.Reader.PrintMsg("Collection saved successfully\n");
-            writer.close();
-        } catch (LackOfAccessException e) {
-            mainlib.Reader.PrintErr("no write rights");
-        } catch (IOException e) {
-            mainlib.Reader.PrintErr("there is no file to save");
-        }
-    }
+//    public void saveData(List<Ticket> tickets) {
+//
+//        /*GsonBuilder builder = new GsonBuilder();
+//        builder.serializeNulls();
+//        Gson gson = builder.setPrettyPrinting().create();*/
+//
+//        Gson gson = new Gson();
+//        try {
+//            if (!Files.isWritable(Paths.get(PATH))) {
+//                throw new LackOfAccessException();
+//            }
+//            BufferedWriter writer = new BufferedWriter(new FileWriter(PATH));
+//            writer.write(gson.toJson(tickets));
+//            mainlib.Reader.PrintMsg("Collection saved successfully\n");
+//            writer.close();
+//        } catch (LackOfAccessException e) {
+//            mainlib.Reader.PrintErr("no write rights");
+//        } catch (IOException e) {
+//            mainlib.Reader.PrintErr("there is no file to save");
+//        }
+//    }
 
     /**
      * additional check if the collection in the file was changed manually

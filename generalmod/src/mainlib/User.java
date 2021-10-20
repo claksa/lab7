@@ -7,7 +7,6 @@ import java.io.Serializable;
 public class User  implements Serializable {
     private final String username;
     private String password;
-    private String salt;
     private final UserAct userAct;
 
     public User(String username,String password, UserAct userAct){
@@ -24,17 +23,11 @@ public class User  implements Serializable {
         return password;
     }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public String getSalt() {
-        return salt;
-    }
 
     public UserAct getUserAct() {
         return userAct;

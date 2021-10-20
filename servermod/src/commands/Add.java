@@ -18,7 +18,6 @@ public class Add extends AbstractCommand {
     public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
         ArrayList<String> addCommand = new ArrayList<>();
         if (Server.getDatabase().addToDatabase(ticket)) {
-            collectionManager.addItem(ticket);
             addCommand.add("the new item added to the collection\n");
         } else {
             addCommand.add("error with adding to the collection");
