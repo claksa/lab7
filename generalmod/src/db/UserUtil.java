@@ -17,36 +17,30 @@ public class UserUtil implements Util {
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String ALG = "SHA-512";
     private String userSalt;
-    private String userPepper;
-    private final HashMap<String, String> usersPeppers = new HashMap<>();
 
 
     @Override
     public boolean register(User user) {
         String statement = "INSERT INTO users (username,password,salt) VALUES(?,?,?)";
-        try {
-            PreparedStatement preparedStatement = Server.getDatabase().connection.prepareStatement(statement);
-            preparedStatement.setString(1, user.getUsername());
-            preparedStatement.setString(2, getStringHash(generateHash(user)));
-            preparedStatement.setString(3, userSalt);
-            if (preparedStatement.executeUpdate() != 0) {
-                usersPeppers.put(user.getUsername(), userPepper);
-                return true;
+        if (!checkUser(user)) {
+            try {
+                PreparedStatement preparedStatement = Server.getDatabase().connection.prepareStatement(statement);
+                preparedStatement.setString(1, user.getUsername());
+                preparedStatement.setString(2, getStringHash(generateHash(user)));
+                preparedStatement.setString(3, userSalt);
+                if (preparedStatement.executeUpdate() != 0) {
+                    return true;
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         }
         return false;
     }
 
     @Override
     public boolean authorize(User user) {
-        for (Map.Entry<String, String> item : usersPeppers.entrySet()) {
-            if (item.getKey().equals(user.getUsername()) && item.getValue()!=null){
-                return true;
-            }
-        }
-        return false;
+        return checkUser(user);
     }
 
 
@@ -67,7 +61,7 @@ public class UserUtil implements Util {
         return password;
     }
 
-    public boolean checkUser(User user) {
+    private boolean checkUser(User user) {
         String statement = "SELECT * FROM users WHERE username=?";
         ResultSet resultSet = null;
         int count = 0;
@@ -92,7 +86,7 @@ public class UserUtil implements Util {
             md = MessageDigest.getInstance(ALG);
             String password = user.getPassword();
             userSalt = getStringSalt(generateSalt());
-            userPepper = generatePepper();
+            String userPepper = generatePepper();
             hash = md.digest((userPepper + password + userSalt).getBytes());
         } catch (NoSuchAlgorithmException e) {
             Reader.PrintErr("no such encryption algorithm: " + ALG);

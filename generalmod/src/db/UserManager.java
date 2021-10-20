@@ -12,36 +12,24 @@ public class UserManager implements Util {
 
     @Override
     public boolean register(User user) {
-        if (!check(user)) {
-            isAuthorized = userUtil.register(user);
-            if (isAuthorized) {
-                userState = UserState.AUTHORIZED;
-                name = user.getUsername();
-                return true;
-            }
+        isAuthorized = userUtil.register(user);
+        if (isAuthorized) {
+            userState = UserState.AUTHORIZED;
+            name = user.getUsername();
+            return true;
         }
         return false;
     }
 
     @Override
     public boolean authorize(User user) {
-        if (check(user)) {
-            isAuthorized = userUtil.authorize(user);
-            if (isAuthorized) {
-                userState = UserState.AUTHORIZED;
-                name = user.getUsername();
-                return true;
-            }
+        isAuthorized = userUtil.authorize(user);
+        if (isAuthorized) {
+            userState = UserState.AUTHORIZED;
+            name = user.getUsername();
+            return true;
         }
         return false;
-    }
-
-    public boolean check(User user) {
-        return userUtil.checkUser(user);
-    }
-
-    public UserUtil getUserUtil() {
-        return userUtil;
     }
 
     public static UserState getUserState() {
