@@ -16,13 +16,11 @@ public class AddMin extends AbstractCommand {
     @Override
     public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
         ArrayList<String> addMinCommand = new ArrayList<>();
-            if (Server.getDatabase().checkId(id)) {
-                if (Server.getDatabase().addIfMin(ticket)) {
-                    addMinCommand.add("an element smaller than the entered ID (" + id + ")does not exist --> " + "your ticket successfully added");
-                } else {
-                    addMinCommand.add("Error adding ticket. For execution, you must enter the ID strictly less than the minimum");
-                }
-            }
+        if (Server.getDatabase().addIfMin(ticket)) {
+            addMinCommand.add("the new item added to the collection\n");
+        } else {
+            addMinCommand.add("error with adding to the collection");
+        }
         return addMinCommand;
     }
 

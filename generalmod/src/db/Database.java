@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 
 public class Database {
     private static final Logger log = Logger.getLogger(Database.class.getName());
-//    private static final String URL = "jdbc:postgresql://pg:5432/studs";
+    //    private static final String URL = "jdbc:postgresql://pg:5432/studs";
     private static final String URL = "jdbc:postgresql://localhost:5674/studs";
     private static final String LOGIN = "s312196";
     UserManager userManager = new UserManager();
-//    private static final String PASSWORD = System.getenv().get("PASSWORD");
+    //    private static final String PASSWORD = System.getenv().get("PASSWORD");
     Connection connection;
     Statement statement;
     private boolean isValid;
@@ -83,13 +83,13 @@ public class Database {
     }
 
     public boolean clearCollection() {
-        String request = "TRUNCATE TABLE tickets";
-        return execute(request);
-    }
-
-    public boolean execute(String request) {
+        String sql = "TRUNCATE TABLE tickets WHERE ticket=?";
         try {
-            if(statement.execute(request)) return true;
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, userManager.getName());
+            if (preparedStatement.executeUpdate()!=0){
+                return true;
+            }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -97,15 +97,16 @@ public class Database {
     }
 
 
-    public boolean checkId(Integer id){
+
+    public boolean checkId(Integer id) {
         String statement = "SELECT FROM tickets WHERE id=?";
         ResultSet resultSet = null;
         int count = 0;
-        try{
+        try {
             PreparedStatement preparedStatement = connection.prepareStatement(statement);
-            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(1, id);
             resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 count++;
             }
         } catch (SQLException throwables) {
@@ -148,11 +149,33 @@ public class Database {
         return false;
     }
 
-    public void updateCollection(Ticket update){
-        List<Ticket> tickets = getTickets().stream().map(ticket -> ticket.getId().equals(update.getId()) ? update : ticket).collect(Collectors.toCollection(Vector::new));
-        for (Ticket t: tickets){
-            addToDatabase(t);
+    public boolean updateCollection(Ticket update) {
+        String sql = "UPDATE tickets set coordinate1 = ?, coordinate2 = ?, creation = ?, price = ?, valuation = ?, venue = ?, place = ?, street = ?, zip = ?, coordinate3 = ?, coordinate4 = ?, coordinate5 = ?, town = ?,capacity = ? WHERE (id = ?) and (ticket = ?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setDouble(1, update.getCoordinates().getX());
+            preparedStatement.setInt(2, update.getCoordinates().getY());
+            preparedStatement.setString(3, String.valueOf(update.getCreationDate()));
+            preparedStatement.setInt(4, update.getPrice());
+            preparedStatement.setString(5, String.valueOf(update.getType()));
+            preparedStatement.setString(6, update.getVenue().getName());
+            preparedStatement.setString(7, String.valueOf(update.getVenue().getType()));
+            preparedStatement.setString(8, update.getVenue().getAddress().getStreet());
+            preparedStatement.setString(9, update.getVenue().getAddress().getZipCode());
+            preparedStatement.setFloat(10, update.getVenue().getAddress().getTown().getX());
+            preparedStatement.setInt(11, update.getVenue().getAddress().getTown().getY());
+            preparedStatement.setInt(12, update.getVenue().getAddress().getTown().getZ());
+            preparedStatement.setString(13, update.getVenue().getAddress().getTown().getName());
+            preparedStatement.setInt(14, update.getVenue().getCapacity());
+            preparedStatement.setInt(15, update.getId());
+            preparedStatement.setString(16, userManager.getName());
+            if (preparedStatement.executeUpdate() != 0) {
+                return true;
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
+        return false;
     }
 
 

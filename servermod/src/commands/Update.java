@@ -22,9 +22,11 @@ public class Update extends AbstractCommand {
         try {
             if (argument.trim().equals("")) throw new EmptyIOException();
             id = Integer.parseInt(argument.trim());
-            if (Server.getDatabase().checkId(id)) throw new NoSuchIdException();
-            Server.getDatabase().updateCollection(ticket);
-            updateCommand.add("updated\n");
+            if (!Server.getDatabase().checkId(id)) throw new NoSuchIdException();
+            ticket.setId(id);
+            if (Server.getDatabase().updateCollection(ticket)) {
+                updateCommand.add("updated\n");
+            }
         } catch (NumberFormatException e) {
             updateCommand.add("Error: you enter not number value");
         } catch (EmptyIOException e) {
