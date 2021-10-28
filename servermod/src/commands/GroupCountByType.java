@@ -16,10 +16,12 @@ public class GroupCountByType extends AbstractCommand {
     /**
      * execute group_count_by_type command
      * @param argument ticket type as string
+     * @param username
+     *
      */
 
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
         ArrayList<String> groupCommand = new ArrayList<>(collectionManager.groupCount());
         groupCommand.add("groupcountbytype executed\n");
         return groupCommand;

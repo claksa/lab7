@@ -23,7 +23,7 @@ public class Server {
     DatagramChannel channel;
     static Selector selector;
     public static boolean running = false;
-    private static final int PORT = 9000;
+    private static final int PORT = 6060;
     static volatile Database database = new Database();
     private static final Logger log = Logger.getLogger(Server.class.getName());
 

@@ -13,6 +13,9 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.logging.Logger;
 
 import static db.UserAct.LOG_IN;
@@ -27,7 +30,9 @@ public class RequestDataHandler implements Runnable {
     CommandNet commandNet;
     AnswerType answerType;
     UserState userState;
-    volatile UserManager um = Server.getDatabase().getUserManager();
+    Wrapper wrapper = new Wrapper();
+    User thisUser;
+    UserManager um = Server.getDatabase().getUserManager();
     private static final Logger log = Logger.getLogger(ReceiveDataHandler.class.getName());
 
     public RequestDataHandler(SelectionKey key) {
@@ -52,19 +57,8 @@ public class RequestDataHandler implements Runnable {
                 throw new EmptyIOException();
             }
             Answer answer = null;
-            if (received instanceof CommandNet) {
-                commandNet = (CommandNet) received;
-                Wrapper wrapper = new Wrapper();
-                String command = wrapper.getWrappedCommand(commandNet);
-                String argument = wrapper.getArgument();
-                Ticket tick = wrapper.getWrappedTicket(commandNet);
-                Integer id = wrapper.getWrappedId(commandNet);
-                if (!UserManager.getUserState().equals(UserState.NOT_REGISTERED) || command.equals("connect")) {
-                    answer = new Executor().execute(command, argument, tick, id);
-                    answerType = WIN;
-                }
-            } else if (received instanceof User) {
-                User thisUser = (User) received;
+            if (received instanceof User) {
+                thisUser = (User) received;
                 ArrayList<String> answerList = new ArrayList<>();
                 if (thisUser.getUserAct().equals(REGISTER)) {
                     if (um.register(thisUser)) {
@@ -91,6 +85,25 @@ public class RequestDataHandler implements Runnable {
                 }
                 answer.setUserState(userState);
             }
+            if (received instanceof CommandNet) {
+                commandNet = (CommandNet) received;
+                String command = wrapper.getWrappedCommand(commandNet);
+                String argument = wrapper.getArgument();
+                String username = wrapper.getWrappedUserName(commandNet);
+                Ticket tick = wrapper.getWrappedTicket(commandNet);
+                Integer id = wrapper.getWrappedId(commandNet);
+                boolean cannotexecute = true;
+                if (!um.getUserUtil().checkUserName(username)) {
+                    ArrayList<String> answerList = new ArrayList<>();
+                    answerList.add("There are no registered users with this name!");
+                    answer = new Answer(answerList, ERROR);
+                    cannotexecute = false;
+                }
+                if (!UserManager.getUserState().equals(UserState.NOT_REGISTERED) || command.equals("connect") || !cannotexecute) {
+                    answer = new Executor().execute(command, argument, tick, id, username);
+                    answerType = WIN;
+                }
+            }
             oos.writeObject(answer);
             byte[] b = out.toByteArray();
             ByteBuffer buff = ByteBuffer.wrap(b);
@@ -106,5 +119,6 @@ public class RequestDataHandler implements Runnable {
             DataManager.getLock().writeLock().unlock();
         }
     }
+
 
 }

@@ -2,6 +2,8 @@ package db;
 
 import mainlib.User;
 
+import java.util.ArrayList;
+
 
 public class UserManager implements Util {
     private final UserUtil userUtil = new UserUtil();
@@ -38,6 +40,10 @@ public class UserManager implements Util {
 
     public String getName() {
         return name;
+    }
+
+    public UserUtil getUserUtil() {
+        return userUtil;
     }
 
     public static boolean isAuthorized() {

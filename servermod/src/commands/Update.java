@@ -17,7 +17,7 @@ public class Update extends AbstractCommand {
     }
 
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
         ArrayList<String> updateCommand = new ArrayList<>();
         try {
             if (argument.trim().equals("")) throw new EmptyIOException();

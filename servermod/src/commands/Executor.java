@@ -3,6 +3,7 @@ package commands;
 
 import lib.ListHolder;
 import mainlib.Answer;
+import mainlib.User;
 import models.Ticket;
 
 import java.io.Serializable;
@@ -17,7 +18,7 @@ import static mainlib.Reader.PrintMsg;
 public class Executor implements Serializable {
 
 
-    public Answer execute(String receivedCommand, String argument, Ticket ticket, Integer id) {
+    public Answer execute(String receivedCommand, String argument, Ticket ticket, Integer id, String username) {
         boolean isRightCommand = false;
         Commandable commandToExecute = null;
         Answer answer = null;
@@ -31,7 +32,7 @@ public class Executor implements Serializable {
                 }
             }
             if (isRightCommand) {
-                answer = new Answer(commandToExecute.execute(argument,ticket, id),WIN);
+                answer = new Answer(commandToExecute.execute(argument,ticket, id, username),WIN);
                 PrintMsg("command was successfully executed!\n");
             }
         } else {

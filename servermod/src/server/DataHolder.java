@@ -18,7 +18,7 @@ public class DataHolder  {
     DatagramChannel channel = null;
 
 
-   public Object getReceivedData()  {
+   public  Object getReceivedData()  {
        Object data = null;
        try(ByteArrayInputStream in = new ByteArrayInputStream(b);
            ObjectInputStream ois = new ObjectInputStream(in)){

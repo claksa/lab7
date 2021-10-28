@@ -3,10 +3,8 @@ package commands;
 
 import lib.CollectionManager;
 import models.Ticket;
-import server.Server;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class Shuffle extends AbstractCommand {
     private final CollectionManager collectionManager;
@@ -22,7 +20,7 @@ public class Shuffle extends AbstractCommand {
     }
 
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
         ArrayList<String> shuffleCommand = new ArrayList<>();
         collectionManager.shuffle();
         shuffleCommand.add("shuffled\n");

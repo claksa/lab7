@@ -43,7 +43,7 @@ public class ScriptExecutor {
                         if (commandable.getName().trim().equals("add")) {
                             changeScanner(scriptManager.getScriptReader());
                             try {
-                                ExecuteScript.getExecuteScriptCommand().addAll(commandable.execute(cmd[1],null,null ));
+                                ExecuteScript.getExecuteScriptCommand().addAll(commandable.execute(cmd[1],null,null, null));
                                 isFindCommand = true;
                                 break;
                             } catch (NoSuchElementException e) {
@@ -51,7 +51,7 @@ public class ScriptExecutor {
                             }
                             changeScanner(new Scanner(System.in));
                         } else {
-                            ExecuteScript.getExecuteScriptCommand().addAll(commandable.execute(cmd[1],null ,null));
+                            ExecuteScript.getExecuteScriptCommand().addAll(commandable.execute(cmd[1],null ,null, null));
                             isFindCommand = true;
                             break;
                         }

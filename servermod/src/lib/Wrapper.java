@@ -2,6 +2,7 @@ package lib;
 
 import commands.Commandable;
 import mainlib.CommandNet;
+import mainlib.User;
 import models.Ticket;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.io.Serializable;
 public class Wrapper implements Serializable {
     String command;
     String argument;
+
 
 
     public String getWrappedCommand(CommandNet cmd) {
@@ -37,4 +39,7 @@ public class Wrapper implements Serializable {
         return argument;
     }
 
+    public String getWrappedUserName(CommandNet cmd){
+        return cmd.getUsername();
+    }
 }

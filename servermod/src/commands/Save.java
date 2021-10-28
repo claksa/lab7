@@ -14,7 +14,7 @@ public class Save extends AbstractCommand {
     }
 
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
         ArrayList<String> saveCommand = new ArrayList<>();
 //        collectionManager.save();
         String message = "saved\n";

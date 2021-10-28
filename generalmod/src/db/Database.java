@@ -2,6 +2,7 @@ package db;
 
 import exceptions.EmptyIOException;
 import mainlib.Reader;
+import mainlib.User;
 import models.*;
 import server.Server;
 
@@ -9,14 +10,14 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class Database {
     private static final Logger log = Logger.getLogger(Database.class.getName());
-    //    private static final String URL = "jdbc:postgresql://pg:5432/studs";
+//        private static final String URL = "jdbc:postgresql://pg:5432/studs";
     private static final String URL = "jdbc:postgresql://localhost:5674/studs";
     private static final String LOGIN = "s312196";
     UserManager userManager = new UserManager();
+    Map<String,Set<Integer>> ohMyUsers = new HashMap<>();
     //    private static final String PASSWORD = System.getenv().get("PASSWORD");
     Connection connection;
     Statement statement;
@@ -39,14 +40,14 @@ public class Database {
         return isValid;
     }
 
-    public boolean addToDatabase(Ticket ticket) {
+    public boolean addToDatabase(Ticket ticket, String username) {
         boolean isAddedToDB = false;
         String statement = "INSERT INTO tickets(ticket, coordinate1, coordinate2, creation, price, valuation, venue, place, street, zip, coordinate3, coordinate4, coordinate5, town,capacity) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             if (isValid()) {
-                ticket.setName(userManager.getName());
+                ticket.setName(username);
                 PreparedStatement preparedStatement = connection.prepareStatement(statement);
-                preparedStatement.setString(1, userManager.getName());
+                preparedStatement.setString(1, username);
                 preparedStatement.setDouble(2, ticket.getCoordinates().getX());
                 preparedStatement.setInt(3, ticket.getCoordinates().getY());
                 preparedStatement.setString(4, String.valueOf(ticket.getCreationDate()));
@@ -65,6 +66,8 @@ public class Database {
                 log.info("add object: " + i);
                 if (i != 0) {
                     isAddedToDB = true;
+                    ohMyUsers.put(username,getIds(username));
+                    System.out.println(ohMyUsers);
                 }
             }
         } catch (SQLException throwables) {
@@ -73,21 +76,23 @@ public class Database {
         return isAddedToDB;
     }
 
-    public boolean addIfMin(Ticket ticket) {
+    public boolean addIfMin(Ticket ticket, String username) {
         boolean isAdded = false;
         Integer min = getTickets().stream().map(Ticket::getId).reduce(Integer::compareTo).orElse(-1);
         if (ticket.getId() < min) {
-            isAdded = addToDatabase(ticket);
+            isAdded = addToDatabase(ticket,username);
         }
         return isAdded;
     }
 
-    public boolean clearCollection() {
-        String sql = "TRUNCATE TABLE tickets WHERE ticket=?";
+    public void clearCollection() {
+        String sql = "TRUNCATE TABLE tickets";
+        execute(sql);
+    }
+
+    public boolean execute(String request) {
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, userManager.getName());
-            if (preparedStatement.executeUpdate()!=0){
+            if(statement.execute(request)) {
                 return true;
             }
         } catch (SQLException throwables) {
@@ -115,13 +120,14 @@ public class Database {
         return count > 0;
     }
 
-    public boolean removeById(Integer id) {
+
+    public boolean removeById(Integer id, String userName) {
         String statement = "DELETE FROM tickets WHERE (id = ?) AND (ticket = ?)";
         try {
             if (isValid()) {
                 PreparedStatement preparedStatement = connection.prepareStatement(statement);
                 preparedStatement.setInt(1, id);
-                preparedStatement.setString(2, userManager.getName());
+                preparedStatement.setString(2, userName);
                 if (preparedStatement.executeUpdate() != 0) {
                     return true;
                 }
@@ -181,6 +187,23 @@ public class Database {
 
     public void closeConnection() throws SQLException {
         connection.close();
+    }
+
+    public Set<Integer> getIds(String username){
+        String sql = "SELECT * from tickets WHERE ticket = ?";
+        Set<Integer> ids = new HashSet<>();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,username);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                int id = resultSet.getInt("id");
+                ids.add(id);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ids;
     }
 
     public Vector<Ticket> getTickets() {

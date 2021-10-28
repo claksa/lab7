@@ -54,7 +54,7 @@ public class ServerConsole implements Runnable {
         }
         for (Commandable each : serverList) {
             if (command.equals(each.getName())) {
-                each.execute(command,null, null);
+                each.execute(command,null, null, null);
                 isSuchCommand = true;
             }
         }

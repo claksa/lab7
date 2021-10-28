@@ -14,7 +14,7 @@ public class Info extends AbstractCommand {
 
 
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
         ArrayList<String> infoCommand = new ArrayList<>();
         infoCommand.add(collectionManager.getInformation());
         infoCommand.add("\ninformation received");

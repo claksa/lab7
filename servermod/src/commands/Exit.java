@@ -18,7 +18,7 @@ public class Exit extends AbstractCommand {
      */
 
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
         ArrayList<String> exitCommand = new ArrayList<>();
 //        collectionManager.save();
         System.exit(0);

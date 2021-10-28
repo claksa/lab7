@@ -14,15 +14,11 @@ public class Clear extends AbstractCommand {
     }
 
 
-
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
         ArrayList<String> clearCommand = new ArrayList<>();
-        if (Server.getDatabase().clearCollection()) {
-            clearCommand.add("collection cleaned successfully");
-        } else {
-            clearCommand.add("Error: there is no way to clear the collection. Check your database connection.");
-        }
+        Server.getDatabase().clearCollection();
+        clearCommand.add("collection cleaned successfully");
         return clearCommand;
     }
 

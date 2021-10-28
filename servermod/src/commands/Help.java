@@ -16,7 +16,7 @@ public class Help extends AbstractCommand {
     }
 
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
         ArrayList<String> helpCommand = new ArrayList<>();
         StringBuilder res = new StringBuilder();
         for (Commandable commandable : commandsAvailable) {

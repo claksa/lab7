@@ -4,8 +4,7 @@
     <root id="archive" name="servermod.jar">
       <element id="module-output" name="servermod" />
       <element id="module-output" name="generalmod" />
-      <element id="extracted-dir" path="$USER_HOME$/Downloads/postgresql-42.2.24.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../gson-2.8.6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/postgresql-42.3.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

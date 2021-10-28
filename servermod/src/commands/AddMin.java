@@ -14,9 +14,9 @@ public class AddMin extends AbstractCommand {
     }
 
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
         ArrayList<String> addMinCommand = new ArrayList<>();
-        if (Server.getDatabase().addIfMin(ticket)) {
+        if (Server.getDatabase().addIfMin(ticket,username)) {
             addMinCommand.add("the new item added to the collection\n");
         } else {
             addMinCommand.add("error with adding to the collection");

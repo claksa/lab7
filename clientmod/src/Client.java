@@ -14,7 +14,8 @@ import static mainlib.Reader.PrintMsg;
 
 public class Client {
     static InetAddress address;
-    static SocketAddress serverAdr = new InetSocketAddress("localhost", 9000);
+    private static final int port = 6060;
+    static SocketAddress serverAdr = new InetSocketAddress("localhost", port);
     static DatagramSocket socket;
     static CommandNet commandNetNext = null;
     private static final Scanner scanner = new Scanner(System.in);
@@ -111,7 +112,7 @@ public class Client {
              ObjectOutputStream oos = new ObjectOutputStream(out);) {
             oos.writeObject(data);
             byte[] sendMessage = out.toByteArray();
-            DatagramPacket packet = new DatagramPacket(sendMessage, sendMessage.length, address, 9000);
+            DatagramPacket packet = new DatagramPacket(sendMessage, sendMessage.length, address, port);
             socket.send(packet);
         }
         System.out.println("client send command to server");

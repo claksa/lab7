@@ -14,7 +14,7 @@ public class FilterContainsName extends AbstractCommand {
     }
 
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
         ArrayList<String> filterContainsCommand = new ArrayList<>();
         if (argument.isEmpty()) {
             try {

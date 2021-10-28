@@ -15,7 +15,7 @@ public class User  implements Serializable {
         this.userAct = userAct;
     }
 
-    public String getUsername() {
+    public synchronized String getUsername() {
         return username;
     }
 

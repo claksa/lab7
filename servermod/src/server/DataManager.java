@@ -19,7 +19,7 @@ public class DataManager {
     private static final  Logger log = Logger.getLogger(DataManager.class.getName());
     private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
-    private static ForkJoinPool forkJoinPool = new ForkJoinPool(4);
+    private static final ForkJoinPool forkJoinPool = new ForkJoinPool(4);
 
 
 

@@ -11,12 +11,14 @@ import java.security.SecureRandom;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class UserUtil implements Util {
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String ALG = "SHA-512";
     private String userSalt;
+    private String userPepper;
 
 
     @Override
@@ -78,6 +80,24 @@ public class UserUtil implements Util {
         return count > 0;
     }
 
+    public boolean checkUserName(String user) {
+        String statement = "SELECT * FROM users WHERE username=?";
+        ResultSet resultSet = null;
+        int count = 0;
+        try {
+            PreparedStatement preparedStatement = Server.getDatabase().connection.prepareStatement(statement);
+            preparedStatement.setString(1, user);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                count++;
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return count > 0;
+    }
+
+
 
     private byte[] generateHash(User user) {
         MessageDigest md = null;
@@ -86,7 +106,7 @@ public class UserUtil implements Util {
             md = MessageDigest.getInstance(ALG);
             String password = user.getPassword();
             userSalt = getStringSalt(generateSalt());
-            String userPepper = generatePepper();
+            userPepper = generatePepper();
             hash = md.digest((userPepper + password + userSalt).getBytes());
         } catch (NoSuchAlgorithmException e) {
             Reader.PrintErr("no such encryption algorithm: " + ALG);
@@ -112,6 +132,5 @@ public class UserUtil implements Util {
     private String getStringHash(byte[] hash) {
         return DatatypeConverter.printHexBinary(hash);
     }
-
 
 }

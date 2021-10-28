@@ -18,7 +18,6 @@ public class CollectionManager {
     public CollectionManager() throws EmptyIOException {
         this.tickets = Server.getDatabase().getTickets();
         setIdList();
-        sortCollection();
     }
 
     public String show(){

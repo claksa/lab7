@@ -22,8 +22,8 @@ public class ExecuteScript extends AbstractCommand {
     }
 
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
-        String path = "C:\\учёба\\itmo\\labs\\programming\\lab6\\script.txt";
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
+        String path = "script.txt";
         System.out.println("argument that you really entered as a path: " + argument);
         executeScriptCommand = new ArrayList<>();
         try {

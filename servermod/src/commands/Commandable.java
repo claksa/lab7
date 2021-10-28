@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 public interface Commandable  {
     String getDescription();
-    ArrayList<String> execute (String argument, Ticket ticket, Integer id);
+    ArrayList<String> execute (String argument, Ticket ticket, Integer id, String username);
 
     default String getName() {
         return getClass().getSimpleName().toLowerCase();

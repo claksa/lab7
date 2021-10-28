@@ -2,7 +2,6 @@ package commands;
 
 import lib.CollectionManager;
 import models.Ticket;
-import server.RequestDataHandler;
 import server.Server;
 
 import java.util.ArrayList;
@@ -15,9 +14,9 @@ public class Add extends AbstractCommand {
     }
 
     @Override
-    public ArrayList<String> execute(String argument, Ticket ticket, Integer id) {
+    public ArrayList<String> execute(String argument, Ticket ticket, Integer id, String username) {
         ArrayList<String> addCommand = new ArrayList<>();
-        if (Server.getDatabase().addToDatabase(ticket)) {
+        if (Server.getDatabase().addToDatabase(ticket,username)) {
             addCommand.add("the new item added to the collection\n");
         } else {
             addCommand.add("error with adding to the collection");
